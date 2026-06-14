@@ -1,0 +1,445 @@
+# Prismic GraphQL API Schema
+#
+# Source: Derived from Prismic GraphQL API Technical Reference documentation
+# (https://prismic.io/docs/graphql-technical-reference) and the official
+# prismic-client TypeScript SDK type definitions
+# (https://github.com/prismicio/prismic-client).
+#
+# Note: Prismic GraphQL schemas are partly dynamic — custom types defined in a
+# repository generate corresponding Query fields (e.g., allBlog_posts, blog_post)
+# and object types at runtime. The types below represent the stable built-in
+# base schema that is present in every Prismic repository.
+#
+# The endpoint requires GET requests and the Prismic-Ref header specifying the
+# content reference (version). Private repositories also require an Authorization
+# header with an access token.
+#
+# Endpoint: https://{your-repo-name}.cdn.prismic.io/graphql
+
+# ---------------------------------------------------------------------------
+# Scalars
+# ---------------------------------------------------------------------------
+
+"""
+ISO 8601 date string (e.g., "2024-01-15").
+"""
+scalar Date
+
+"""
+ISO 8601 datetime string (e.g., "2024-01-15T12:00:00+0000").
+"""
+scalar DateTime
+
+"""
+A JSON scalar for arbitrary structured data (used in embed and integration fields).
+"""
+scalar Json
+
+"""
+A hex color string (e.g., "#ff5733").
+"""
+scalar String
+
+# ---------------------------------------------------------------------------
+# Interfaces
+# ---------------------------------------------------------------------------
+
+"""
+Base interface implemented by all Prismic document types. Every custom type
+defined in a repository will implement this interface.
+"""
+interface _Document {
+  """
+  Metadata for this document.
+  """
+  _meta: Meta!
+}
+
+"""
+Shared interface for all linkable content in Prismic.
+"""
+interface _Linkable {
+  _linkType: String
+}
+
+# ---------------------------------------------------------------------------
+# Meta / Alternate Language
+# ---------------------------------------------------------------------------
+
+"""
+Metadata attached to every Prismic document. Accessible via the `_meta` field
+on any document type.
+"""
+type Meta {
+  """
+  Unique identifier for this document within the repository.
+  """
+  id: String!
+
+  """
+  User-defined unique identifier (UID) for this document. Null if the custom
+  type does not have a UID field.
+  """
+  uid: String
+
+  """
+  The API ID of the custom type this document belongs to (e.g., "blog_post").
+  """
+  type: String!
+
+  """
+  List of tags associated with this document.
+  """
+  tags: [String!]!
+
+  """
+  BCP 47 language code of this document (e.g., "en-us").
+  """
+  lang: String!
+
+  """
+  ISO 8601 datetime when the document was first published.
+  """
+  firstPublicationDate: DateTime
+
+  """
+  ISO 8601 datetime when the document was last published.
+  """
+  lastPublicationDate: DateTime
+
+  """
+  Alternate language versions of this document.
+  """
+  alternateLanguages: [RelatedDocument!]!
+}
+
+"""
+A reference to an alternate-language version of a document.
+"""
+type RelatedDocument {
+  id: String!
+  uid: String
+  type: String!
+  lang: String!
+}
+
+# ---------------------------------------------------------------------------
+# Link Types
+# ---------------------------------------------------------------------------
+
+"""
+An external web link (link_type: "Web"). Returned as a union member in link
+fields when the editor has entered a URL.
+"""
+type _ExternalLink implements _Linkable {
+  _linkType: String
+
+  """
+  The absolute URL of the external link.
+  """
+  url: String!
+
+  """
+  The anchor target attribute (e.g., "_blank"). May be null.
+  """
+  target: String
+}
+
+"""
+A link to a media/file asset stored in Prismic (link_type: "Media"). Returned
+as a union member in link-to-media fields.
+"""
+type _FileLink implements _Linkable {
+  _linkType: String
+
+  """
+  The public URL of the file.
+  """
+  url: String!
+
+  """
+  The original filename of the asset.
+  """
+  name: String!
+
+  """
+  MIME kind of the asset (e.g., "image", "document").
+  """
+  kind: String!
+
+  """
+  File size in bytes as a string.
+  """
+  size: String!
+
+  """
+  Width in pixels for image assets. Null for non-image assets.
+  """
+  width: String
+
+  """
+  Height in pixels for image assets. Null for non-image assets.
+  """
+  height: String
+}
+
+"""
+A link that points to an image asset. This is an alias for _FileLink that
+appears in the GraphQL union for image link fields.
+"""
+type _ImageLink implements _Linkable {
+  _linkType: String
+  url: String!
+  name: String!
+  kind: String!
+  size: String!
+  width: String
+  height: String
+}
+
+# ---------------------------------------------------------------------------
+# Image Field
+# ---------------------------------------------------------------------------
+
+"""
+Dimensions of an image in pixels.
+"""
+type ImageDimensions {
+  width: Int!
+  height: Int!
+}
+
+"""
+Edit/crop metadata stored alongside an image in a Prismic repository.
+"""
+type ImageEdit {
+  x: Float!
+  y: Float!
+  zoom: Float!
+  background: String!
+}
+
+"""
+A single image (the main image or a named thumbnail) within an ImageField.
+"""
+type ImageFieldImage {
+  id: String
+  url: String
+  dimensions: ImageDimensions
+  edit: ImageEdit
+  alt: String
+  copyright: String
+}
+
+# ---------------------------------------------------------------------------
+# GeoPoint Field
+# ---------------------------------------------------------------------------
+
+"""
+A geographic coordinate.
+"""
+type GeoPoint {
+  latitude: Float!
+  longitude: Float!
+}
+
+# ---------------------------------------------------------------------------
+# Embed Field
+# ---------------------------------------------------------------------------
+
+"""
+An oEmbed-compatible embed object returned for embed fields.
+"""
+type EmbedField {
+  embed_url: String!
+  type: String
+  version: String
+  title: String
+  author_name: String
+  author_url: String
+  provider_name: String
+  provider_url: String
+  thumbnail_url: String
+  thumbnail_width: Int
+  thumbnail_height: Int
+  html: String
+  width: Int
+  height: Int
+  url: String
+}
+
+# ---------------------------------------------------------------------------
+# Pagination Types
+# ---------------------------------------------------------------------------
+
+"""
+Cursor-based pagination information returned on connection types.
+"""
+type PageInfo {
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+"""
+An edge in a document connection, pairing a cursor with the document node.
+"""
+type DocumentEdge {
+  cursor: String!
+  node: _Document!
+}
+
+"""
+A paginated connection of Prismic documents. Returned by `_allDocuments` and
+by dynamically generated `all{Type}s` fields.
+"""
+type DocumentConnection {
+  pageInfo: PageInfo!
+  edges: [DocumentEdge]
+  totalCount: Int!
+}
+
+# ---------------------------------------------------------------------------
+# Filtering / Sorting Inputs
+# ---------------------------------------------------------------------------
+
+"""
+Filter argument for `similar` queries. Finds content related to a given
+document by its ID.
+"""
+input SimilarInput {
+  """
+  The document ID to find similar content for.
+  """
+  documentId: String!
+
+  """
+  Maximum number of results to consider for similarity.
+  """
+  max: Int!
+}
+
+# ---------------------------------------------------------------------------
+# Root Query
+# ---------------------------------------------------------------------------
+
+"""
+The root Query type. In addition to the built-in `_allDocuments` field, each
+Prismic repository automatically generates:
+
+  - `all{Type_id}s(...)`: returns a DocumentConnection for every custom type
+    (e.g., `allBlog_posts`, `allPages`)
+  - `{type_id}(uid, lang)`: returns a single document for singleton or
+    UID-based types (e.g., `blog_post(uid:"hello", lang:"en-us")`)
+
+These dynamic fields share the same filter, sort, and pagination arguments
+shown on `_allDocuments` below.
+"""
+type Query {
+  """
+  Retrieve all documents across every custom type in the repository. Supports
+  filtering, sorting, and cursor-based pagination.
+  """
+  _allDocuments(
+    """
+    Return the first N results (max 100).
+    """
+    first: Int
+
+    """
+    Return the last N results (max 100).
+    """
+    last: Int
+
+    """
+    Return results after this cursor (for forward pagination).
+    """
+    after: String
+
+    """
+    Return results before this cursor (for backward pagination).
+    """
+    before: String
+
+    """
+    Full-text search across all document fields.
+    """
+    fulltext: String
+
+    """
+    Filter by a specific document ID.
+    """
+    id: String
+
+    """
+    Filter by a list of document IDs.
+    """
+    id_in: [String!]
+
+    """
+    Filter by a specific UID value.
+    """
+    uid: String
+
+    """
+    Filter by a list of UID values.
+    """
+    uid_in: [String!]
+
+    """
+    Filter by language (BCP 47 code, e.g., "en-us"). Use "*" for all languages.
+    """
+    lang: String
+
+    """
+    Filter documents that contain all of the given tags.
+    """
+    tags: [String!]
+
+    """
+    Filter documents that contain at least one of the given tags.
+    """
+    tags_in: [String!]
+
+    """
+    Filter by first publication date (after this ISO 8601 datetime).
+    """
+    firstPublicationDate_after: DateTime
+
+    """
+    Filter by first publication date (before this ISO 8601 datetime).
+    """
+    firstPublicationDate_before: DateTime
+
+    """
+    Filter by last publication date (after this ISO 8601 datetime).
+    """
+    lastPublicationDate_after: DateTime
+
+    """
+    Filter by last publication date (before this ISO 8601 datetime).
+    """
+    lastPublicationDate_before: DateTime
+
+    """
+    Field-level filter using Prismic predicates. The value is a JSON-encoded
+    predicate object. Comparison suffixes supported: _gt, _lt, _before,
+    _after, _range, _near.
+    """
+    where: Json
+
+    """
+    Find documents similar to the specified document.
+    """
+    similar: SimilarInput
+
+    """
+    Sort results. Value is a generated enum-like string:
+    meta_firstPublicationDate_ASC, meta_firstPublicationDate_DESC,
+    meta_lastPublicationDate_ASC, meta_lastPublicationDate_DESC, or
+    custom field sort keys with _ASC / _DESC suffix.
+    """
+    sortBy: String
+  ): DocumentConnection
+}
