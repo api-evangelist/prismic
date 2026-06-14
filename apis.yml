@@ -1,0 +1,60 @@
+aid: prismic
+name: Prismic
+description: |
+  Prismic is a headless CMS and page builder that empowers marketing teams to
+  create and manage website content independently while developers work in their
+  preferred tech stack. It provides a GraphQL API and REST Content API for
+  fetching structured content from Prismic repositories, enabling fast, CDN-backed
+  delivery for modern web applications.
+type: Index
+image: https://kinlane-productions2.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+url: https://prismic.io
+baseURL: https://{your-repo-name}.cdn.prismic.io/graphql
+created: 2026-06-14
+modified: 2026-06-14
+specificationVersion: '0.19'
+tags:
+  - GraphQL
+  - Headless CMS
+  - Content Management
+  - Page Builder
+  - JAMstack
+  - Marketing
+apis:
+  - aid: prismic:graphql-api
+    name: Prismic GraphQL API
+    description: |
+      The Prismic GraphQL API is a read-only endpoint that allows developers to
+      perform deep and selective fetching of content documents from a Prismic
+      repository. Each repository exposes its own GraphQL endpoint with an
+      integrated explorer for discovering schema types and testing queries.
+    tags:
+      - GraphQL
+    image: https://kinlane-productions2.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+    humanURL: https://prismic.io/docs/graphql-technical-reference
+    baseURL: https://{your-repo-name}.cdn.prismic.io/graphql
+    properties:
+      - url: https://prismic.io/docs/graphql-technical-reference
+        type: Documentation
+      - url: graphql/prismic-graphql.md
+        type: GraphQL
+common:
+  - url: https://prismic.io
+    type: Website
+  - url: https://prismic.io/docs/graphql-technical-reference
+    type: Documentation
+  - url: https://www.linkedin.com/company/prismic-io
+    type: LinkedIn
+  - url: https://github.com/prismicio
+    type: GitHubOrganization
+  - url: https://prismic.io/pricing
+    type: Pricing
+  - url: plans/prismic-plans.md
+    type: Plans
+  - url: rate-limits/prismic-rate-limits.md
+    type: RateLimits
+  - url: finops/prismic-finops.md
+    type: FinOps
+maintainers:
+  - FN: Kin Lane
+    email: kin@apievangelist.com
