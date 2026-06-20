@@ -7,7 +7,7 @@ description: |
   fetching structured content from Prismic repositories, enabling fast, CDN-backed
   delivery for modern web applications.
 type: Index
-image: https://kinlane-productions2.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
 url: https://prismic.io
 baseURL: https://{your-repo-name}.cdn.prismic.io/graphql
 created: 2026-06-14
@@ -30,7 +30,7 @@ apis:
       integrated explorer for discovering schema types and testing queries.
     tags:
       - GraphQL
-    image: https://kinlane-productions2.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+    image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
     humanURL: https://prismic.io/docs/graphql-technical-reference
     baseURL: https://{your-repo-name}.cdn.prismic.io/graphql
     properties:
