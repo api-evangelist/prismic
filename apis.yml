@@ -1,28 +1,37 @@
 aid: prismic
 name: Prismic
 description: |
-  Prismic is a headless CMS and page builder that empowers marketing teams to
-  create and manage website content independently while developers work in their
-  preferred tech stack. It provides a GraphQL API and REST Content API for
-  fetching structured content from Prismic repositories, enabling fast, CDN-backed
-  delivery for modern web applications.
+  Prismic is a headless CMS and page builder that lets marketing teams create and
+  manage website content independently while developers work in their preferred
+  stack. Content is modelled as custom types and reusable "slices", authored in a
+  visual Page Builder or locally in Slice Machine, and delivered over a CDN-backed
+  API. Prismic runs seven public HTTP APIs across four hosts: a Content API and
+  Repository API for reads, a beta Tags API, a Types API for content models, an
+  Asset API for the media library, a Migration API for bulk content creation, and
+  a read-only GraphQL endpoint whose schema is generated per repository from the
+  customer's own content model. Every read is addressed to a content "ref" naming
+  a specific published version. Prismic also ships a first-party CLI, a published
+  Agent Skill, and a remote OAuth-protected MCP server with sixteen tools, and
+  supports Next.js, Nuxt and SvelteKit with first-party rendering components.
 type: Index
 accessModel:
-  pricing: unknown
-  onboarding: unknown
-  trial: false
-  try_now: false
-  public: false
-  label: Unknown
-  confidence: low
-  source: []
-  generated: '2026-07-22'
-  method: derived
+  pricing: freemium
+  onboarding: self-service
+  trial: true
+  try_now: true
+  public: true
+  label: Public self-service with a free tier
+  confidence: high
+  source:
+    - https://prismic.io/pricing
+    - https://prismic.io/dashboard/signup
+  generated: '2026-08-13'
+  method: probed
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/prismic.png
 url: https://prismic.io
-baseURL: https://{your-repo-name}.cdn.prismic.io/graphql
+baseURL: https://{your-repo-name}.cdn.prismic.io/api/v2
 created: 2026-06-14
-modified: 2026-06-14
+modified: 2026-08-13
 specificationVersion: '0.19'
 tags:
   - GraphQL
@@ -31,14 +40,64 @@ tags:
   - Page Builder
   - JAMstack
   - Marketing
+  - Content Delivery
+  - Developer Tools
+  - MCP
+  - Webhooks
+  - Localization
+  - Digital Asset Management
 apis:
+  - aid: prismic:content-api
+    name: Prismic Content API
+    description: |
+      The Content API is Prismic's primary read surface. It queries published
+      documents from a repository with a bracketed filter language (`q`),
+      orderings, locale selection, link expansion (`fetchLinks`) and a route
+      resolver that populates each document's URL. Every query must carry a
+      `ref` naming the content version, obtained first from the Repository API.
+      Requests to the `.cdn.prismic.io` host are cached at the edge and are
+      exempt from both the 200-request-per-second rate limit and the plan's
+      monthly API-call quota.
+    tags:
+      - Content Management
+      - Content Delivery
+    humanURL: https://prismic.io/docs/content-api
+    baseURL: https://{your-repo-name}.cdn.prismic.io/api/v2
+    properties:
+      - url: https://prismic.io/docs/content-api
+        type: Documentation
+      - url: https://prismic.io/docs/content-api
+        type: APIReference
+      - url: conventions/prismic-conventions.yml
+        type: Conventions
+      - url: rate-limits/prismic-rate-limits.yml
+        type: RateLimits
+  - aid: prismic:repository-api
+    name: Prismic Repository API
+    description: |
+      The Repository API is the gateway to a Prismic repository. A single
+      unauthenticated GET returns the repository's available refs (including the
+      master ref every Content API query needs), its custom type IDs, its
+      configured locales, its per-repository OAuth endpoints and its content
+      license. It is the discovery document for everything else.
+    tags:
+      - Content Management
+    humanURL: https://prismic.io/docs/repository-api-technical-reference
+    baseURL: https://{your-repo-name}.cdn.prismic.io/api/v2
+    properties:
+      - url: https://prismic.io/docs/repository-api-technical-reference
+        type: Documentation
+      - url: data-model/prismic-data-model.yml
+        type: DataModel
   - aid: prismic:graphql-api
     name: Prismic GraphQL API
     description: |
-      The Prismic GraphQL API is a read-only endpoint that allows developers to
-      perform deep and selective fetching of content documents from a Prismic
-      repository. Each repository exposes its own GraphQL endpoint with an
-      integrated explorer for discovering schema types and testing queries.
+      A read-only GraphQL endpoint for deep and selective fetching of content
+      from a Prismic repository. The schema is generated per repository: every
+      custom type and shared slice produces its own object types, Where* filters,
+      Sort* enums and Query root fields at runtime, on top of a small built-in
+      base schema. Queries are sent as GET requests with a `Prismic-Ref` header.
+      Each repository also gets its own hosted GraphQL explorer.
     tags:
       - GraphQL
     image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
@@ -49,31 +108,179 @@ apis:
         type: Documentation
       - url: graphql/prismic-graphql.md
         type: GraphQL
+      - url: graphql/prismic-base-schema.graphql
+        type: GraphQL
+  - aid: prismic:types-api
+    name: Prismic Types API
+    description: |
+      The Types API reads and writes a repository's content models — custom types
+      and Slice Machine shared slices — as JSON. It is how content models are
+      backed up, versioned, generated into TypeScript types, and promoted between
+      repositories. Requires a bearer write token plus a `repository` header.
+    tags:
+      - Content Management
+      - Developer Tools
+    humanURL: https://prismic.io/docs/custom-types-api
+    baseURL: https://customtypes.prismic.io
+    properties:
+      - url: https://prismic.io/docs/custom-types-api
+        type: Documentation
+      - url: https://documenter.getpostman.com/view/5743666/TzCHBqbH
+        type: Postman
+      - url: errors/prismic-error-codes.yml
+        type: ErrorCatalog
+  - aid: prismic:asset-api
+    name: Prismic Asset API
+    description: |
+      The Asset API manages a repository's media library: list and search assets
+      by keyword, upload a new asset as multipart form data, patch its alt text,
+      notes and credits, or delete it. One asset per request and one request per
+      second. Assets are served through an imgix-backed CDN with automatic format
+      and compression negotiation.
+    tags:
+      - Digital Asset Management
+    humanURL: https://prismic.io/docs/asset-api-technical-reference
+    baseURL: https://asset-api.prismic.io
+    properties:
+      - url: https://prismic.io/docs/asset-api-technical-reference
+        type: Documentation
+  - aid: prismic:migration-api
+    name: Prismic Migration API
+    description: |
+      The Migration API creates and updates Prismic pages programmatically, using
+      the same document shape the Content API returns. Everything it writes lands
+      in a migration release as a draft for human review rather than going live.
+      One page per request, one request per second per repository. Generally
+      available since August 2025.
+    tags:
+      - Content Management
+    humanURL: https://prismic.io/docs/migration-api-technical-reference
+    baseURL: https://migration.prismic.io
+    properties:
+      - url: https://prismic.io/docs/migration-api-technical-reference
+        type: Documentation
+      - url: https://prismic.io/docs/migration
+        type: GettingStarted
+  - aid: prismic:tags-api
+    name: Prismic Tags API
+    description: |
+      A single-endpoint beta API that returns every tag used across a
+      repository's pages, including tags on drafts and pages staged in releases,
+      as a flat array. Access is activated on request via the community forum.
+    tags:
+      - Content Management
+    humanURL: https://prismic.io/docs/tags-api-technical-reference
+    baseURL: https://{your-repo-name}.cdn.prismic.io/api/tags
+    properties:
+      - url: https://prismic.io/docs/tags-api-technical-reference
+        type: Documentation
+  - aid: prismic:mcp
+    name: Prismic MCP Server
+    description: |
+      A remote, OAuth-protected Model Context Protocol server that lets an AI
+      assistant search, read, create and publish Prismic content in conversation.
+      Sixteen tools across discovery, read and write. MCP is activated per
+      repository in settings; the server acts as the signed-in Prismic user, so
+      it only reaches repositories that account can access, and publishing a
+      release additionally requires a Publisher role. Launched 2026-06-08.
+    tags:
+      - MCP
+      - Content Management
+    humanURL: https://prismic.io/docs/mcp
+    baseURL: https://mcp.prismic.io/mcp
+    properties:
+      - url: https://prismic.io/docs/mcp
+        type: Documentation
+      - url: mcp/prismic-mcp.yml
+        type: MCPServer
+      - url: mcp/prismic-tool-crosswalk.yml
+        type: ToolCrosswalk
 common:
+  - type: Website
+    url: https://prismic.io
+  - type: DeveloperPortal
+    url: https://prismic.io/developers
+  - type: Documentation
+    url: https://prismic.io/docs
+  - type: APIReference
+    url: https://prismic.io/docs/apis
+  - type: GettingStarted
+    url: https://prismic.io/docs/nextjs
+  - type: Support
+    url: https://prismic.io/docs/help-center
+  - type: HelpCenter
+    url: https://community.prismic.io/
+  - type: Blog
+    url: https://prismic.io/blog
+  - type: GitHubOrganization
+    url: https://github.com/prismicio
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/prismic-io
+  - type: Pricing
+    url: https://prismic.io/pricing
+  - type: SignUp
+    url: https://prismic.io/dashboard/signup
+  - type: TermsOfService
+    url: https://prismic.io/legal/terms-of-service
+  - type: PrivacyPolicy
+    url: https://prismic.io/legal/privacy
+  - type: Postman
+    url: https://documenter.getpostman.com/view/5743666/TzCHBqbH
+  - type: ChangeLog
+    url: https://prismic.io/updates
+  - type: ChangeLog
+    url: changelog/prismic-changelog.yml
+  - type: StatusPage
+    url: https://status.prismic.io/
+  - type: Lifecycle
+    url: lifecycle/prismic-lifecycle.yml
+  - type: Security
+    url: https://prismic.io/legal/security
   - type: TrustCenter
     url: security/prismic-trust-center.yml
   - type: VulnerabilityDisclosure
     url: security/prismic-vulnerability-disclosure.yml
   - type: DomainSecurity
     url: security/prismic-domain-security.yml
-  - url: https://prismic.io/blog
-    type: Blog
-  - url: https://prismic.io
-    type: Website
-  - url: https://prismic.io/docs/graphql-technical-reference
-    type: Documentation
-  - url: https://www.linkedin.com/company/prismic-io
-    type: LinkedIn
-  - url: https://github.com/prismicio
-    type: GitHubOrganization
-  - url: https://prismic.io/pricing
-    type: Pricing
-  - url: plans/prismic-plans.md
-    type: Plans
-  - url: rate-limits/prismic-rate-limits.md
-    type: RateLimits
-  - url: finops/prismic-finops.md
-    type: FinOps
+  - type: Authentication
+    url: authentication/prismic-authentication.yml
+  - type: Conventions
+    url: conventions/prismic-conventions.yml
+  - type: Conformance
+    url: conformance/prismic-conformance.yml
+  - type: ErrorCatalog
+    url: errors/prismic-error-codes.yml
+  - type: DataModel
+    url: data-model/prismic-data-model.yml
+  - type: Packages
+    url: packages/prismic-packages.yml
+  - type: SDKs
+    url: packages/prismic-packages.yml
+  - type: CLI
+    url: cli/prismic-cli.yml
+  - type: Components
+    url: components/prismic-components.yml
+  - type: Sandbox
+    url: sandbox/prismic-sandbox.yml
+  - type: Webhooks
+    url: asyncapi/prismic-webhooks.yml
+  - type: AgentSkill
+    url: skills/_index.yml
+  - type: LLMsTxt
+    url: llms/prismic-llms.txt
+  - type: WellKnown
+    url: well-known/prismic-well-known.yml
+  - type: Plans
+    url: plans/prismic-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/prismic-rate-limits.yml
+  - type: FinOps
+    url: finops/prismic-finops.md
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-08-13'
+  status: enriched
+  artifacts_added: 24
+  pass: local-v1
