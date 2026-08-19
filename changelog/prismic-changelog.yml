@@ -1,0 +1,157 @@
+generated: '2026-08-13'
+method: probed
+source: https://prismic.io/updates
+probe: >-
+  Prismic runs its own marketing site on a public Prismic repository
+  (prismic-main), so the changelog is readable as data from Prismic's own
+  Content API rather than scraped from the rendered page:
+  GET https://prismic-main.cdn.prismic.io/api/v2/documents/search
+  ?ref=<master>&q=[[at(document.type,"update_item")]] -> HTTP 200, 85 entries;
+  and the same query for document.type "update_page" -> HTTP 200, 63 entries.
+  Titles, dates and slugs below are verbatim from those responses.
+url: https://prismic.io/updates
+entry_url_pattern: https://prismic.io/updates/{uid}
+scheme:
+  api_versioning: uri-path (Content API v2) — see lifecycle/prismic-lifecycle.yml
+  product_changelog: dated, untagged
+  note: >-
+    Prismic's changelog is a PRODUCT changelog, not an API version log. Entries
+    are dated and slugged but carry no version number, and there is no separate
+    per-API release note stream. Package-level changes are versioned in the
+    GitHub releases of each npm package instead.
+entry_count_total: 85
+window: 2026-06-08 back to 2025-03-21
+entries:
+  - date: '2026-06-08'
+    slug: mcp
+    title: Do your content work without leaving the AI tools you already use
+    url: https://prismic.io/updates/mcp
+    kind: addition
+    breaking: false
+    highlights:
+      - Launch of the Prismic MCP Server at https://mcp.prismic.io/mcp
+      - 16 tools across discovery, read and write; OAuth against the user's Prismic
+        identity
+    artifact: mcp/prismic-mcp.yml
+  - date: '2026-06-08'
+    slug: cli
+    title: Build Prismic sites with your AI agent
+    url: https://prismic.io/updates/cli
+    kind: addition
+    breaking: false
+    highlights:
+      - Launch of the `prismic` CLI (npx prismic)
+      - Launch of the published Agent Skill, `npx skills add --global prismicio/skills`
+    artifact: cli/prismic-cli.yml
+  - date: '2026-01-20'
+    slug: auto-upgrade
+    title: Auto-Upgrade with Spend manager
+    url: https://prismic.io/updates/spend-manager
+    kind: addition
+    breaking: false
+    highlights: [Plan auto-upgrade and spend controls in billing]
+  - date: '2026-01-15'
+    slug: simulator-framework-sdk
+    title: Slice Simulator is now available directly from framework integrations
+    kind: addition
+    breaking: false
+  - date: '2026-01-06'
+    slug: javascript-packages-2026
+    title: 2026 refreshed packages
+    url: https://prismic.io/updates/javascript-packages
+    kind: change
+    breaking: false
+    highlights: [Refresh across the first-party JavaScript package set]
+    artifact: packages/prismic-packages.yml
+  - date: '2025-11-27'
+    slug: figma-to-prismic-slice-is-live
+    title: Go from component design in Figma to structured slice in seconds
+    kind: addition
+    breaking: false
+  - date: '2025-09-30'
+    slug: your-latest-releases-now-appear-first-in-the-list
+    title: 'New: Your Latest Releases Now Appear First in the List'
+    kind: change
+    breaking: false
+  - date: '2025-09-01'
+    slug: autosave-and-rtc-rollout
+    title: Real-time collaboration rollout
+    kind: addition
+    breaking: false
+  - date: '2025-08-04'
+    slug: migration-api-launch
+    title: Migration API is now out of beta
+    kind: addition
+    breaking: false
+    highlights: [General availability of the Migration API (https://migration.prismic.io)]
+  - date: '2025-07-16'
+    slug: nuxt-4-support
+    title: Nuxt 4 support
+    kind: addition
+    breaking: false
+  - date: '2025-07-01'
+    slug: documentation-design
+    title: New design
+    kind: change
+    breaking: false
+    highlights: [Documentation redesign]
+  - date: '2025-06-26'
+    slug: easier-content-relationships
+    title: We made content relationships way easier for you
+    kind: change
+    breaking: false
+  - date: '2025-06-24'
+    slug: translate-with-ai-glossary
+    title: Translate with AI now supports glossary uploads
+    kind: addition
+    breaking: false
+  - date: '2025-06-23'
+    slug: api-explorer-support-orderings
+    title: Orderings are now supported by the API Explorer!
+    kind: addition
+    breaking: false
+  - date: '2025-06-16'
+    slug: api-explorer-support-all-query
+    title: The API Explorer now supports all query types!
+    kind: addition
+    breaking: false
+  - date: '2025-06-06'
+    slug: api-explorer-release
+    title: New API Explorer is out!
+    kind: addition
+    breaking: false
+    artifact: sandbox/prismic-sandbox.yml
+  - date: '2025-06-05'
+    slug: status-indicator-live
+    title: See who's working on the same page as you with status indicators
+    kind: addition
+    breaking: false
+  - date: '2025-05-28'
+    slug: translate-with-ai-instructions
+    title: 'New: Add custom translation instructions to your pages'
+    kind: addition
+    breaking: false
+  - date: '2025-05-21'
+    slug: a-smoother-safer-way-to-log-in
+    title: A smoother, safer way to log in
+    kind: change
+    breaking: false
+    highlights: [New authentication system (prismic-auth.eu.auth0.com)]
+  - date: '2025-05-20'
+    slug: free-trial-translate-with-ai
+    title: Translate with AI available for everyone with a free trial
+    kind: addition
+    breaking: false
+observations:
+  api_surface_changes_in_window: 2
+  api_surface_note: >-
+    Across the last 20 dated entries only two touch a machine-readable API
+    surface: the Migration API's GA (2025-08-04) and the MCP server's launch
+    (2026-06-08). The Content, Repository, Tags, Types, Asset and GraphQL APIs
+    have not appeared in the changelog in the captured window — consistent with a
+    stable v2 contract, and with the docs' own lastUpdated stamps (Content API
+    and GraphQL reference both 2025-11-06).
+  agent_surface_cadence: >-
+    Prismic shipped its CLI, its Agent Skill and its MCP server on the same day,
+    2026-06-08 — the whole agent-facing surface landed as one release, not
+    incrementally.

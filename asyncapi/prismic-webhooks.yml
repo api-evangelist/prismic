@@ -1,0 +1,125 @@
+generated: '2026-08-13'
+method: searched
+source: https://prismic.io/docs/webhooks
+spec_type: none
+spec_note: >-
+  Prismic publishes NO AsyncAPI document. Probes for /asyncapi.yaml and
+  /asyncapi.json on prismic.io and the API hosts missed, and there is no event
+  catalogue in the GitHub org. What Prismic does publish is a documented webhook
+  surface with a fully specified payload schema and a stated delivery contract,
+  captured below. This artifact is therefore a Webhooks catalogue, not an
+  AsyncAPI spec — no AsyncAPI pointer is wired in apis.yml.
+surface: webhooks
+direction: outbound (Prismic -> subscriber)
+transport: HTTP POST
+subscriber_url: caller-supplied
+docs: https://prismic.io/docs/webhooks
+status_page_component: Webhooks (https://status.prismic.io/)
+management:
+  cli:
+    create: npx prismic webhook create https://example.com/my-endpoint
+    scoped_create: npx prismic webhook create <url> --trigger documentsPublished --trigger
+      documentsUnpublished
+    help: npx prismic webhook --help
+  ui: Repository Settings > Webhooks
+  default_triggers: all events
+  api: none — webhooks are managed via the CLI or the dashboard only. There is no HTTP
+    API for webhook subscriptions.
+security:
+  secret:
+    supported: true
+    mechanism: An optional shared secret configured on the webhook and echoed back in
+      the payload's `secret` property.
+    note: >-
+      This is an echoed shared secret, NOT a request signature. There is no HMAC
+      signature header, no timestamp, and therefore no replay protection — a
+      subscriber can only compare the secret in the body. Prismic documents no
+      signing scheme.
+  signature_header: none
+  ip_allowlist: not published
+delivery:
+  success_condition: subscriber responds 200
+  retries: 5
+  retry_interval: 10 minutes
+  auto_disable: Prismic disables a webhook automatically after five consecutive failures.
+  logs: Most recent triggers are listed on the repository's Webhooks page; the Logs
+    tab shows all events from the past 30 days.
+  ordering: not published
+  delivery_guarantee: not published (at-least-once implied by the retry policy)
+events:
+  documented_summary:
+    - A page is published or unpublished.
+    - A release is created, edited, or deleted.
+    - A tag is created or deleted.
+  trigger_names:
+    - documentsPublished
+    - documentsUnpublished
+  trigger_note: >-
+    Prismic names exactly two `--trigger` values in its documentation
+    (documentsPublished, documentsUnpublished) while describing seven distinct
+    events that can fire a webhook. The full trigger vocabulary is discoverable
+    only from `npx prismic webhook create --help`, not from the docs — an
+    undocumented gap between the described events and the addressable triggers.
+  example_payload_scenarios:
+    - A page is published
+    - A page is unpublished
+    - A release is created
+    - A release is updated
+    - A release is deleted
+    - A tag is created
+    - A tag is deleted
+payload:
+  content_type: application/json
+  discriminator: type
+  types: [api-update, test-trigger]
+  ambiguity_warning: >-
+    Prismic states plainly that the payload for a page PUBLISHED is identical to
+    the payload for a page UNPUBLISHED, and recommends configuring two separate
+    endpoints to tell them apart. A single subscriber cannot distinguish the two
+    from the body alone.
+  properties:
+    - {name: type, type: 'api-update | test-trigger', required: true, description: Type
+        of the webhook.}
+    - {name: secret, type: 'string | null', required: false, default: 'null', description: The
+        configured secret, if there is one.}
+    - {name: masterRef, type: string, required: true, description: The new master ref.}
+    - {name: domain, type: string, required: true, description: Your Prismic repository
+        name.}
+    - {name: apiUrl, type: string, required: true, description: Your Prismic repository
+        URL.}
+    - {name: documents, type: 'string[]', required: true, description: A list of page
+        IDs that changed.}
+    - {name: releases, type: object, required: true, description: A list of changes
+        made to releases.}
+    - {name: releases.addition, type: 'object[]', description: 'Added releases — each
+        carries id, ref, label and the IDs of the pages in the release.'}
+    - {name: releases.update, type: 'object[]', description: 'Updated releases — each
+        carries id, ref, label, scheduledAt and the page IDs.'}
+    - {name: releases.deletion, type: 'object[]', description: 'Deleted releases — each
+        carries id, ref, label, scheduledAt and the page IDs.'}
+    - {name: tags, type: object, description: A list of changes made to tags.}
+    - {name: tags.addition, type: 'object[]', description: Added tags, each with an id.}
+    - {name: tags.deletion, type: 'object[]', description: Deleted tags, each with an
+        id.}
+    - {name: bookmarks, type: object, deprecated: true, description: 'Legacy field.
+        Do not use.'}
+    - {name: collection, type: object, deprecated: true, description: 'Legacy field.
+        Do not use.'}
+  payload_carries_content: false
+  payload_note: >-
+    The payload is a change NOTIFICATION, not a change feed. It carries page IDs
+    and the new master ref, never the changed content. A subscriber must call the
+    Content API with the supplied `masterRef` to read what actually changed —
+    which is exactly the intended pattern, since that ref is the cache key.
+common_uses:
+  - name: Trigger a static rebuild on publish
+    hosts_documented: [Netlify, Vercel, AWS Amplify]
+    pattern: 'npx prismic webhook create <build-hook-url> --trigger documentsPublished
+      --trigger documentsUnpublished'
+gaps:
+  - No AsyncAPI document.
+  - No request signature (HMAC) — only an echoed shared secret.
+  - No published trigger vocabulary beyond two named values.
+  - Published and unpublished events are indistinguishable in the payload.
+  - No API for managing webhook subscriptions (CLI/UI only).
+  - No streaming or pub/sub surface — webhooks are the entire event story.

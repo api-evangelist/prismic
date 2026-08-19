@@ -1,0 +1,255 @@
+generated: '2026-08-13'
+method: searched
+source: https://prismic.io/docs/apis.md
+registries_queried:
+  - registry.npmjs.org
+  - pypi.org
+  - rubygems.org
+  - repo.packagist.org
+  - search.maven.org
+note: >-
+  Prismic's published package surface is JavaScript-first. The "API References"
+  page (https://prismic.io/docs/apis.md) lists exactly the packages below as
+  first-party and explicitly marks three as deprecated. The non-JavaScript kits
+  (Python, Ruby, PHP, Java, Scala, Android) are still published on their
+  registries and still reachable at github.com/prismicio, but Prismic no longer
+  lists any of them on its API References page and none has shipped a release in
+  years — the Python kit's last release predates the current Content API v2
+  tooling by six years, and the Java/Scala/Android kits by eight to eleven.
+  Every version/published pair below was read from the registry metadata
+  endpoint on 2026-08-13.
+packages:
+  # --- Clients -------------------------------------------------------------
+  - language: javascript
+    registry: npm
+    name: '@prismicio/client'
+    url: https://www.npmjs.com/package/@prismicio/client
+    install: npm install @prismicio/client
+    official: true
+    version: 7.22.0
+    published: '2026-08-12'
+    docs: https://prismic.io/docs/technical-reference/prismicio-client/v7
+    repo: https://github.com/prismicio/prismic-client
+    role: core client — Content API queries, write client, migrations
+  - language: javascript
+    registry: npm
+    name: '@prismicio/migrate'
+    url: https://www.npmjs.com/package/@prismicio/migrate
+    install: npm install @prismicio/migrate
+    official: true
+    version: 0.0.2
+    published: '2024-09-24'
+    docs: https://prismic.io/docs/technical-reference/prismicio-migrate/v0
+    role: migration helpers (HTML -> Prismic rich text)
+    note: >-
+      Still listed as current on the API References page, but at 0.0.2 and
+      unchanged since 2024-09-24 — the oldest release among the packages Prismic
+      currently promotes, and a year older than the Migration API's own GA
+      (2025-08-04).
+  # --- Framework integrations ---------------------------------------------
+  - language: javascript
+    registry: npm
+    name: '@prismicio/next'
+    url: https://www.npmjs.com/package/@prismicio/next
+    install: npm install @prismicio/next
+    official: true
+    version: 2.3.0
+    published: '2026-07-02'
+    docs: https://prismic.io/docs/technical-reference/prismicio-next/v2
+    role: Next.js integration
+  - language: javascript
+    registry: npm
+    name: '@nuxtjs/prismic'
+    url: https://www.npmjs.com/package/@nuxtjs/prismic
+    install: npm install @nuxtjs/prismic
+    official: true
+    version: 5.3.0
+    published: '2026-05-01'
+    docs: https://prismic.io/docs/technical-reference/nuxtjs-prismic/v5
+    role: Nuxt integration
+  - language: javascript
+    registry: npm
+    name: '@prismicio/svelte'
+    url: https://www.npmjs.com/package/@prismicio/svelte
+    install: npm install @prismicio/svelte
+    official: true
+    version: 2.2.1
+    published: '2026-04-09'
+    docs: https://prismic.io/docs/technical-reference/prismicio-svelte/v2
+    role: SvelteKit integration + Svelte UI components
+  # --- UI components -------------------------------------------------------
+  - language: javascript
+    registry: npm
+    name: '@prismicio/react'
+    url: https://www.npmjs.com/package/@prismicio/react
+    install: npm install @prismicio/react
+    official: true
+    version: 3.4.1
+    published: '2026-04-03'
+    docs: https://prismic.io/docs/technical-reference/prismicio-react/v3
+    role: React components and hooks
+  - language: javascript
+    registry: npm
+    name: '@prismicio/vue'
+    url: https://www.npmjs.com/package/@prismicio/vue
+    install: npm install @prismicio/vue
+    official: true
+    version: 6.1.3
+    published: '2026-04-09'
+    docs: https://prismic.io/docs/technical-reference/prismicio-vue/v6
+    role: Vue plugin, components and composables
+  # --- CLI + Slice Machine -------------------------------------------------
+  - language: javascript
+    registry: npm
+    name: prismic
+    url: https://www.npmjs.com/package/prismic
+    install: npx prismic
+    official: true
+    version: 1.14.0
+    published: '2026-07-31'
+    docs: https://prismic.io/docs/cli
+    role: first-party CLI (see cli/prismic-cli.yml)
+  - language: javascript
+    registry: npm
+    name: slice-machine-ui
+    url: https://www.npmjs.com/package/slice-machine-ui
+    install: npm install --save-dev slice-machine-ui
+    official: true
+    version: 2.21.5
+    published: '2026-08-06'
+    docs: https://prismic.io/docs/slice-machine
+    repo: https://github.com/prismicio/slice-machine
+    role: local content-modeling tool
+  - language: javascript
+    registry: npm
+    name: '@slicemachine/adapter-next'
+    url: https://www.npmjs.com/package/@slicemachine/adapter-next
+    install: npm install --save-dev @slicemachine/adapter-next
+    official: true
+    version: 0.3.98
+    published: '2026-08-06'
+    role: Slice Machine adapter for Next.js
+  - language: javascript
+    registry: npm
+    name: '@slicemachine/adapter-nuxt'
+    url: https://www.npmjs.com/package/@slicemachine/adapter-nuxt
+    install: npm install --save-dev @slicemachine/adapter-nuxt
+    official: true
+    version: 0.3.98
+    published: '2026-08-06'
+    role: Slice Machine adapter for Nuxt
+  - language: javascript
+    registry: npm
+    name: '@slicemachine/adapter-sveltekit'
+    url: https://www.npmjs.com/package/@slicemachine/adapter-sveltekit
+    install: npm install --save-dev @slicemachine/adapter-sveltekit
+    official: true
+    version: 0.3.98
+    published: '2026-08-06'
+    role: Slice Machine adapter for SvelteKit
+  # --- Deprecated (Prismic's own label) ------------------------------------
+  - language: javascript
+    registry: npm
+    name: '@prismicio/richtext'
+    url: https://www.npmjs.com/package/@prismicio/richtext
+    official: true
+    status: deprecated
+    version: 2.1.5
+    published: '2023-05-22'
+    deprecation_source: https://prismic.io/docs/apis.md
+  - language: javascript
+    registry: npm
+    name: '@prismicio/helpers'
+    url: https://www.npmjs.com/package/@prismicio/helpers
+    official: true
+    status: deprecated
+    version: 2.3.9
+    published: '2023-01-28'
+    deprecation_source: https://prismic.io/docs/apis.md
+    replacement: '@prismicio/client'
+  - language: javascript
+    registry: npm
+    name: '@prismicio/types'
+    url: https://www.npmjs.com/package/@prismicio/types
+    official: true
+    status: deprecated
+    version: 0.2.9
+    published: '2024-05-24'
+    deprecation_source: https://prismic.io/docs/apis.md
+    replacement: '@prismicio/client'
+  - language: javascript
+    registry: npm
+    name: prismic-cli
+    url: https://www.npmjs.com/package/prismic-cli
+    official: true
+    status: superseded
+    version: 4.2.3
+    published: '2022-04-21'
+    replacement: prismic
+    note: The old bootstrap CLI. Superseded by the `prismic` package (2026-06-08 launch).
+  # --- Legacy non-JavaScript kits (still published, no longer listed) ------
+  - language: python
+    registry: pypi
+    name: prismic
+    url: https://pypi.org/project/prismic/
+    install: pip install prismic
+    official: true
+    status: unmaintained
+    version: 1.5.1
+    published: '2019-08-13'
+    repo: https://github.com/prismicio/python-kit
+    note: >-
+      Seven years without a release and absent from Prismic's current API
+      References page. Treat as historical.
+  - language: ruby
+    registry: rubygems
+    name: prismic.io
+    url: https://rubygems.org/gems/prismic.io
+    install: gem install prismic.io
+    official: true
+    status: unmaintained
+    version: 1.8.2
+    published: '2021-06-18'
+    repo: https://github.com/prismicio/ruby-kit
+  - language: php
+    registry: packagist
+    name: prismic/php-sdk
+    url: https://packagist.org/packages/prismic/php-sdk
+    install: composer require prismic/php-sdk
+    official: true
+    status: unmaintained
+    version: 5.4.0
+    published: '2025-01-02'
+    repo: https://github.com/prismicio/php-kit
+    note: The most recently touched of the legacy kits, but not listed on the API
+      References page.
+  - language: java
+    registry: maven
+    name: io.prismic:java-kit
+    url: https://search.maven.org/artifact/io.prismic/java-kit
+    official: true
+    status: unmaintained
+    version: 2.0.0
+    published: '2018-01-22'
+  - language: scala
+    registry: maven
+    name: io.prismic:scala-kit_2.12
+    url: https://search.maven.org/artifact/io.prismic/scala-kit_2.12
+    official: true
+    status: unmaintained
+    version: 2.4.2
+    published: '2018-05-30'
+  - language: java
+    registry: maven
+    name: io.prismic:android-kit
+    url: https://search.maven.org/artifact/io.prismic/android-kit
+    official: true
+    status: unmaintained
+    version: 1.2.0
+    published: '2015-10-27'
+summary:
+  official_count: 22
+  current_count: 13
+  deprecated_or_unmaintained_count: 9
+  languages: [javascript, python, ruby, php, java, scala]
+  primary_language: javascript

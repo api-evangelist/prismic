@@ -1,0 +1,113 @@
+generated: '2026-08-13'
+method: searched
+source: https://prismic.io/docs/apis.md
+docs:
+  - https://prismic.io/docs/technical-reference/prismicio-react/v3
+  - https://prismic.io/docs/technical-reference/prismicio-vue/v6
+  - https://prismic.io/docs/technical-reference/prismicio-svelte/v2
+  - https://prismic.io/docs/technical-reference/prismicio-next/v2
+note: >-
+  Distinct from packages/prismic-packages.yml, which catalogues distribution.
+  This file catalogues the client-side RENDERING surface — the UI component
+  families a developer drops into a page to display Prismic content, plus the
+  hosted/embedded editing surfaces Prismic provides. Prismic's content is
+  structured rather than pre-rendered HTML (rich text is an array of typed
+  blocks, slices are typed arrays), so these components are not optional
+  convenience wrappers: they are the reference implementation of how Prismic's
+  field types become DOM.
+families:
+  - name: React components
+    package: '@prismicio/react'
+    version: 3.4.1
+    loader: npm
+    framework: React
+    docs: https://prismic.io/docs/technical-reference/prismicio-react/v3
+    role: Renders Prismic field types as React elements and exposes hooks for client-side
+      fetching.
+    surface: [rich-text rendering, link resolution, image rendering, slice-zone rendering,
+      table rendering, client-side query hooks]
+  - name: Vue components
+    package: '@prismicio/vue'
+    version: 6.1.3
+    loader: npm
+    framework: Vue
+    docs: https://prismic.io/docs/technical-reference/prismicio-vue/v6
+    role: Vue plugin, components and composables for the same field-type surface.
+  - name: Svelte components
+    package: '@prismicio/svelte'
+    version: 2.2.1
+    loader: npm
+    framework: Svelte / SvelteKit
+    docs: https://prismic.io/docs/technical-reference/prismicio-svelte/v2
+    role: Svelte components for the same field-type surface, plus the SvelteKit integration.
+  - name: Next.js components
+    package: '@prismicio/next'
+    version: 2.3.0
+    loader: npm
+    framework: Next.js
+    docs: https://prismic.io/docs/technical-reference/prismicio-next/v2
+    role: >-
+      Next.js-specific components layered over @prismicio/react — image components
+      bound to next/image, and the preview surface that puts a Next.js app into
+      draft mode from a Prismic preview session.
+  - name: Nuxt module
+    package: '@nuxtjs/prismic'
+    version: 5.3.0
+    loader: npm
+    framework: Nuxt
+    docs: https://prismic.io/docs/technical-reference/nuxtjs-prismic/v5
+hosted_surfaces:
+  - name: Page Builder
+    kind: hosted editing UI
+    url: https://prismic.io/page-builder
+    role: Prismic's visual page-composition surface for marketers. Hosted, not embeddable.
+  - name: In-website edit button
+    kind: embedded control
+    role: >-
+      An edit affordance rendered into the customer's own live site that opens the
+      corresponding page in the Page Builder. Listed as a plan feature on every
+      tier in Prismic's pricing data.
+  - name: Preview / draft mode
+    kind: embedded runtime
+    package: '@prismicio/next'
+    role: Renders unpublished content in the customer's site by swapping the content
+      `ref` for a preview ref.
+    docs: https://prismic.io/docs/previews
+  - name: Slice Simulator
+    kind: local dev surface
+    role: >-
+      Renders a single slice in isolation against mock content, served from the
+      customer's own dev server. Since 2026-01-15 it is available directly from
+      the framework integrations rather than only through Slice Machine.
+    docs: https://prismic.io/docs/slice-machine
+  - name: Slice Machine
+    kind: local developer UI
+    package: slice-machine-ui
+    version: 2.21.5
+    role: The local content-modelling app — models slices and custom types and pushes
+      them to Prismic.
+    docs: https://prismic.io/docs/slice-machine
+  - name: GraphQL Explorer
+    kind: hosted API console
+    url: https://{repo}.prismic.io/graphql
+    role: Per-repository GraphQL IDE with autocompletion, served by Prismic.
+    detail: sandbox/prismic-sandbox.yml
+  - name: API Explorer
+    kind: hosted API console
+    role: In-dashboard Content API query builder. Shipped 2025-06-06; gained full query-type
+      and orderings support by 2025-06-23.
+    detail: sandbox/prismic-sandbox.yml
+design_tooling:
+  - name: Figma to slice
+    kind: design import
+    shipped: '2025-11-27'
+    role: Converts a Figma component design into a structured Prismic slice.
+    source: https://prismic.io/updates/figma-to-prismic
+cdn_distribution:
+  script_tag: false
+  note: >-
+    Prismic ships no script-tag / unpkg / jsDelivr embed and no framework-agnostic
+    web-component build. Every component family is an npm package consumed through
+    a bundler, and every one targets React, Vue or Svelte specifically. A team on
+    Angular, Astro, Rails or plain HTML gets no first-party rendering components
+    and must render Prismic's structured field types itself.

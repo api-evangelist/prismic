@@ -1,0 +1,6 @@
+{
+    "resource": "https://mcp.prismic.io/mcp",
+    "authorization_servers": [
+        "https://mcp.prismic.io/"
+    ]
+}

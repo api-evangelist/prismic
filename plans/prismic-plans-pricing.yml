@@ -1,0 +1,115 @@
+generated: '2026-08-13'
+method: probed
+source: https://prismic.io/pricing
+probe: >-
+  Prismic runs prismic.io on a public Prismic repository, so its pricing table is
+  readable as structured data from Prismic's OWN Content API rather than scraped
+  from the rendered page:
+  GET https://prismic-main.cdn.prismic.io/api/v2/documents/search
+  ?ref=<master>&q=[[at(document.type,"pricing_plan")]] -> HTTP 200, 6 documents.
+  Every price, quota and overage below is verbatim from the `pricing_plan`
+  documents in that response, fetched 2026-08-13.
+supersedes: plans/prismic-plans.md
+supersedes_note: >-
+  The prior plans/prismic-plans.md carried stale and partly wrong figures — it
+  listed Starter at $10/month and Platinum at $675/month, when those are the
+  ANNUAL-billing rates; the monthly rates are $15 and $750. It also omitted the
+  Free tier's bandwidth allowance, all overage pricing, and the user and locale
+  caps. Kept on disk for provenance; this file is the accurate one.
+currency: USD
+billing_periods: [monthly, annual]
+billing_note: Prices carry two rates. `price_monthly` is month-to-month; `price_annual_per_month`
+  is the discounted per-month rate on an annual commitment.
+plan_count: 6
+plans:
+  - name: Free
+    order: 1
+    audience: developers
+    short_description: For developers building personal websites or a PoC.
+    price_monthly: 0
+    price_annual_per_month: 0
+    quotas:
+      users: 1
+      locales: 2
+      api_calls_month: 4000000
+      cdn_bandwidth_month: 100 GB
+      documents: unlimited
+      custom_types: unlimited
+      assets: unlimited
+    overages:
+      api_calls: none
+      bandwidth: none
+    features: [Visual Page Builder, Slice Machine, Image optimization and processing,
+      Migration API, Previews, Releases, Scheduling, Webhooks, GraphQL]
+    signup: https://prismic.io/dashboard/signup
+  - name: Starter
+    order: 2
+    audience: developers
+    price_monthly: 15
+    price_annual_per_month: 10
+    quotas: {users: 3, locales: 3, api_calls_month: 4000000, cdn_bandwidth_month: 100
+        GB}
+    overages: {api_calls: none, bandwidth: 'paid up to 500 GB at $0.30/GB'}
+  - name: Small
+    order: 3
+    audience: developers
+    price_monthly: 30
+    price_annual_per_month: 25
+    quotas: {users: 7, locales: 4, api_calls_month: 4000000, cdn_bandwidth_month: 100
+        GB}
+    overages: {api_calls: none, bandwidth: 'paid up to 500 GB at $0.30/GB'}
+  - name: Medium
+    order: 4
+    audience: organizations
+    short_description: For teams who are scaling their content.
+    price_monthly: 180
+    price_annual_per_month: 150
+    quotas: {users: 25, locales: 5, api_calls_month: 5000000, cdn_bandwidth_month: 500
+        GB}
+    overages: {api_calls: none, bandwidth: 'paid up to 1 TB at $0.30/GB'}
+    features: [Everything in Small, User roles, Roles per team space, Full revision
+        history]
+  - name: Platinum
+    order: 5
+    audience: organizations
+    price_monthly: 750
+    price_annual_per_month: 675
+    quotas: {users: unlimited, locales: 8, api_calls_month: 10000000, cdn_bandwidth_month: 1
+        TB}
+    overages:
+      api_calls: paid up to 20 million on yearly invoiced plans
+      bandwidth: paid up to 5 TB at $0.25/GB
+    add_ons:
+      - {name: Development environment, price: $3000/year, note: paid option on yearly
+          invoiced plan}
+  - name: Enterprise
+    order: 6
+    audience: organizations
+    price_monthly: null
+    price_annual_per_month: null
+    price_model: contact sales
+    quotas: {users: unlimited, locales: custom, api_calls_month: custom, cdn_bandwidth_month: custom}
+    features: [Custom usage quotas (API calls, CDN, locales), 2 development environments,
+      Backups, Custom roles, Customer Success Manager, SSO, Infosec and legal review,
+      Support and uptime SLAs, Priority/Premium support, Custom training sessions]
+    note: The only tier with an SLA and the only tier with SSO.
+api_relevant_observations:
+  - >-
+    Every tier including Free includes the Migration API, GraphQL, webhooks,
+    Slice Machine and previews. Prismic does not gate its API surface by plan —
+    it meters it. The paywall is quota, not capability.
+  - >-
+    The metered units are API calls and CDN bandwidth, and cached CDN reads count
+    against neither the per-second rate limit nor the monthly call quota. A
+    consumer's bill is therefore a function of cache-hit rate more than of
+    request volume.
+  - >-
+    `ai_features` is "Upon request" on every self-serve tier — the AI capabilities
+    Prismic markets heavily are not self-serve at any price below Enterprise
+    contact.
+  - >-
+    No plan mentions the MCP server. MCP is activated per repository in settings
+    with no stated plan requirement.
+cross_references:
+  rate_limits: rate-limits/prismic-rate-limits.yml
+  finops: finops/prismic-finops.md

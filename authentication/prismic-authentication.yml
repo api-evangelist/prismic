@@ -1,0 +1,143 @@
+generated: '2026-08-13'
+method: searched
+source: https://prismic.io/docs/custom-types-api
+docs:
+  - https://prismic.io/docs/custom-types-api#authentication
+  - https://prismic.io/docs/fetch-content#content-visiblity
+  - https://prismic.io/docs/mcp#authentication
+  - https://prismic.io/docs/cli
+note: >-
+  Derived-from-OpenAPI was not possible: Prismic publishes no OpenAPI for any of
+  its seven HTTP APIs (`derive-authentication.py prismic` produced no profile).
+  Everything below was read from Prismic's own documentation, and the two OAuth
+  discovery documents were fetched live from mcp.prismic.io.
+summary:
+  types: [apiKey, http, oauth2]
+  api_key_in: [query, header]
+  oauth2_flows: [authorizationCode]
+  read_write_split: true
+  read_write_note: >-
+    Prismic splits credentials by direction. READ (Content / Repository / Tags /
+    GraphQL) uses an access token, and is optional entirely — a repository set to
+    "Open API" visibility needs no credential at all. WRITE (Types / Asset /
+    Migration) requires a bearer WRITE token, which is a different artifact minted
+    a different way. The MCP server uses neither: it is OAuth against the user's
+    own Prismic identity.
+schemes:
+  - name: contentAccessTokenQuery
+    type: apiKey
+    in: query
+    parameter: access_token
+    applies_to: [Content API, Repository API]
+    required: only for private repositories
+    docs: https://prismic.io/docs/content-api
+    description: >-
+      A long secret string appended as a URL search parameter. Required only when
+      the repository's API visibility is private; public ("Open API") repositories
+      answer anonymously.
+    observed: >-
+      Verified live — https://prismic-main.cdn.prismic.io/api/v2 and
+      /api/v2/documents/search both returned HTTP 200 with no credential at all
+      on 2026-08-13, because Prismic's own repository is publicly readable.
+  - name: contentAccessTokenHeader
+    type: http
+    scheme: bearer
+    applies_to: [GraphQL API]
+    required: only for private repositories
+    docs: https://prismic.io/docs/graphql-technical-reference
+    description: 'Authorization: Bearer <access-token> for private repositories querying
+      the GraphQL endpoint.'
+  - name: writeToken
+    type: http
+    scheme: bearer
+    bearer_format: JWT
+    applies_to: [Types API, Asset API, Migration API]
+    required: always
+    docs: https://prismic.io/docs/custom-types-api#authentication
+    description: >-
+      A permanent bearer write token. Minted with `npx prismic token create
+      --write`, or in the dashboard under Settings > API & Security > Write APIs.
+      Multiple tokens can be issued for different applications. Prismic's docs
+      warn explicitly that these tokens "carry many privileges" and must not be
+      committed or exposed client-side.
+    paired_header:
+      name: repository
+      required: true
+      description: The repository ID (e.g. `your-repo-name`). The write APIs live on
+        shared hosts, so the target repository is named in a header rather than in
+        the hostname.
+    transport: HTTPS only — "Calls made over plain HTTP and without authentication
+      will fail."
+  - name: repositoryOAuth
+    type: oauth2
+    flow: authorizationCode
+    applies_to: [Content API (temporary access tokens)]
+    docs: https://prismic.io/docs/fetch-content#content-visiblity
+    description: >-
+      Each repository advertises its own OAuth endpoints in the Repository API
+      root document, for issuing temporary content access tokens.
+    endpoints_are_per_repository: true
+    endpoint_pattern:
+      authorizationUrl: https://{repo}.prismic.io/auth
+      tokenUrl: https://{repo}.prismic.io/auth/token
+    observed: >-
+      Live Repository API response for prismic-main returned
+      oauth_initiate=https://prismic-main.prismic.io/auth and
+      oauth_token=https://prismic-main.prismic.io/auth/token (HTTP 200, 2026-08-13).
+    scopes: []
+    scopes_note: No scope vocabulary is published for this flow.
+  - name: mcpOAuth
+    type: oauth2
+    flow: authorizationCode
+    pkce: S256
+    applies_to: [MCP server]
+    docs: https://prismic.io/docs/mcp#authentication
+    discovery:
+      protected_resource: https://mcp.prismic.io/.well-known/oauth-protected-resource
+      authorization_server: https://mcp.prismic.io/.well-known/oauth-authorization-server
+      probed: '2026-08-13'
+      http_status: 200
+      files:
+        - well-known/prismic-mcp-oauth-protected-resource.json
+        - well-known/prismic-mcp-oauth-authorization-server.json
+    issuer: https://mcp.prismic.io/
+    authorizationUrl: https://mcp.prismic.io/authorize
+    tokenUrl: https://mcp.prismic.io/token
+    revocationUrl: https://mcp.prismic.io/revoke
+    registrationUrl: https://mcp.prismic.io/register
+    dynamic_client_registration: true
+    grant_types: [authorization_code, refresh_token]
+    token_endpoint_auth_methods: [client_secret_post, none]
+    scopes: []
+    scopes_note: >-
+      `scopes_supported` is absent from the authorization-server metadata.
+      Authorization is not scope-based: the MCP server acts as the signed-in
+      Prismic user, so reach is bounded by that account's repository access and
+      role. `publish_release` additionally requires a Publisher (Manager) role.
+      Because there is no published scope vocabulary, no scopes/ artifact is
+      emitted.
+    identity_provider: prismic-auth.eu.auth0.com
+  - name: cliSession
+    type: oauth2
+    flow: authorizationCode
+    applies_to: [Prismic CLI]
+    docs: https://prismic.io/docs/cli
+    description: '`npx prismic login` opens a browser sign-in; `npx prismic whoami`
+      reports the logged-in account; `npx prismic logout` clears it.'
+identity_platform:
+  provider: Auth0 (EU tenant)
+  host: prismic-auth.eu.auth0.com
+  evidence: >-
+    Prismic's MCP troubleshooting instructions tell users to reset a stuck session
+    at https://prismic-auth.eu.auth0.com/v2/logout.
+  changelog: 'New authentication system, 2025-05-12 (https://prismic.io/updates/new-authentication-system)'
+sso:
+  supported: true
+  tier: Enterprise only
+  source: https://prismic.io/docs/users
+gaps:
+  - No OpenAPI or other machine-readable description of any HTTP API, so no
+    securityScheme can be parsed rather than read.
+  - No OAuth scope vocabulary on either OAuth surface.
+  - No token rotation, expiry or revocation policy published for write tokens
+    (they are described as "permanent").

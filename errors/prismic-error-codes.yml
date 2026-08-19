@@ -1,0 +1,166 @@
+generated: '2026-08-13'
+method: searched
+source: https://prismic.io/docs/custom-types-api
+docs:
+  - https://prismic.io/docs/custom-types-api
+  - https://prismic.io/docs/content-api
+  - https://prismic.io/docs/tags-api-technical-reference
+  - https://prismic.io/docs/webhooks
+format: none
+format_note: >-
+  Prismic publishes NO error reference page and NO error envelope schema. It is
+  not RFC 9457 (`application/problem+json`) and it is not a documented
+  proprietary envelope either — there is no error code vocabulary anywhere in the
+  documentation. What follows is assembled from (a) the per-route status codes
+  Prismic states inline in its Types API reference, (b) the handful of failure
+  modes named in prose elsewhere in the docs, and (c) error bodies OBSERVED live
+  on 2026-08-13. Observed rows are marked `observed: true` and carry the exact
+  body returned. Nothing here is inferred from a spec, because there is no spec.
+problems:
+  # --- Types API: the only routes with documented status codes -------------
+  - status: 200
+    api: Types API
+    operation: GET /customtypes | GET /customtypes/{id} | GET /slices | GET /slices/{id}
+    title: OK
+    documented: true
+  - status: 201
+    api: Types API
+    operation: POST /customtypes/insert | POST /slices/insert
+    title: Created
+    documented: true
+  - status: 204
+    api: Types API
+    operation: POST /customtypes/update | POST /slices/update | DELETE /customtypes/{id}
+      | DELETE /slices/{id}
+    title: No Content
+    meaning: The update or delete succeeded.
+    documented: true
+  - status: 409
+    api: Types API
+    operation: POST /customtypes/insert | POST /slices/insert
+    title: Conflict
+    meaning: A custom type or shared slice with the same ID already exists in the repository.
+    remediation: Use the corresponding /update route instead of /insert.
+    documented: true
+  - status: 422
+    api: Types API
+    operation: POST /customtypes/update | POST /slices/update
+    title: Unprocessable Entity
+    meaning: No custom type or shared slice with that ID exists in the repository,
+      so it cannot be updated.
+    remediation: Use the corresponding /insert route instead of /update.
+    documented: true
+  # --- Content API ---------------------------------------------------------
+  - status: 429
+    api: Content API
+    title: Too Many Requests
+    meaning: The 200-requests-per-second uncached limit was exceeded.
+    remediation: >-
+      Route the query through the `.cdn.prismic.io` host — cached queries have no
+      rate limit. `@prismicio/client` v5+ handles this automatically and retries
+      after one second.
+    documented: true
+    source: https://prismic.io/docs/content-api#limits
+    retry_after_header: not documented
+  - status: 400
+    api: Content API
+    title: Bad Request — missing or expired ref
+    meaning: >-
+      Every Content API query requires a `ref`. Prismic states that query URLs
+      "will expire as the ref goes out of date" and that old refs "will get purged
+      eventually", so a cached or hard-coded query URL fails after enough
+      publishes.
+    remediation: Re-fetch the current master ref from the Repository API before querying.
+    documented: prose only — no status code is stated for this failure
+    status_confidence: low
+  # --- Tags API ------------------------------------------------------------
+  - status: 404
+    api: Tags API
+    operation: GET /api/tags
+    title: Not Found
+    meaning: >-
+      Returned when the repository is brand new and has no tags at all. A
+      repository that HAS had tags returns an empty array `[]` instead. Prismic
+      documents this explicitly — the same "no tags" condition produces two
+      different responses depending on repository history.
+    documented: true
+    source: https://prismic.io/docs/tags-api-technical-reference
+    note: An agent must treat 404 as an empty result here, not as an error.
+  - status: 403
+    api: Tags API
+    title: Forbidden — beta not activated
+    meaning: The Tags API is in beta and must be activated per repository via the community
+      forum.
+    documented: prose only
+    status_confidence: low
+  # --- Observed live -------------------------------------------------------
+  - status: 403
+    api: Types API
+    observed: true
+    observed_url: https://customtypes.prismic.io/openapi.json
+    observed_body: '{"message":"User is not authorized to access this resource with
+      an explicit deny in an identity-based policy"}'
+    title: AWS API Gateway explicit deny
+    meaning: >-
+      Unrouted or unauthenticated paths on customtypes.prismic.io and
+      asset-api.prismic.io return the raw AWS API Gateway deny message. This is
+      infrastructure output, not a Prismic error envelope — it carries no error
+      code, no type and no documentation link.
+  - status: 404
+    api: Migration API
+    observed: true
+    observed_url: https://migration.prismic.io/openapi.json
+    observed_body: '{"message":"no Route matched with those values","request_id":"6410f254df0b7f66dee1d3552d7e072d"}'
+    title: Kong gateway — no route matched
+    meaning: >-
+      migration.prismic.io sits behind Kong. Unrouted paths return Kong's own JSON
+      with a `request_id`. Again, gateway output rather than a Prismic error type.
+  - status: 429
+    api: Asset API
+    observed: true
+    observed_url: https://asset-api.prismic.io/.well-known/*
+    title: Too Many Requests
+    meaning: >-
+      The Asset API's documented one-request-per-second limit is enforced on ALL
+      paths, including unauthenticated ones — a sequence of eight probes one after
+      another tripped it. The limit is per-host, not per-endpoint.
+    documented: true
+  - status: 401
+    api: MCP server
+    observed: true
+    observed_url: https://mcp.prismic.io/mcp
+    observed_body: '{"error":"Unauthorized"}'
+    title: Unauthorized
+    meaning: Anonymous JSON-RPC calls (including tools/list) are rejected. The server
+      requires an OAuth bearer token.
+  - status: 405
+    api: MCP server
+    observed: true
+    observed_url: https://mcp.prismic.io/mcp
+    observed_body: Method not allowed
+    title: Method Not Allowed
+    meaning: GET on the MCP endpoint. The endpoint accepts POST (JSON-RPC) only.
+webhook_delivery_errors:
+  source: https://prismic.io/docs/webhooks
+  contract: >-
+    Prismic treats any response other than 200 from a subscriber as a failure.
+    Failed deliveries are re-attempted every 10 minutes, up to 5 times. Five
+    CONSECUTIVE failures cause Prismic to disable the webhook automatically.
+    Delivery logs for the past 30 days are visible in the repository's Webhooks
+    page.
+  retries: 5
+  retry_interval: 10 minutes
+  auto_disable_after: 5 consecutive failures
+  log_retention_days: 30
+gaps:
+  - No error reference page anywhere in the documentation.
+  - No error envelope schema — not RFC 9457, not a documented proprietary shape.
+  - No stable error `code` vocabulary, so an agent cannot branch on anything but
+    the HTTP status.
+  - No documented status codes at all for the Content, Repository, Asset or
+    Migration APIs' success and failure paths (the Types API is the only one that
+    states them inline).
+  - No `Retry-After` on 429 and no rate-limit headers — see
+    rate-limits/prismic-rate-limits.yml.
+  - Three different gateways (AWS API Gateway, Kong, the CDN) surface three
+    different error body shapes on the same brand's APIs.

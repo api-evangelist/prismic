@@ -1,0 +1,154 @@
+generated: '2026-08-13'
+method: searched
+source: https://prismic.io/legal/security
+note: >-
+  Two different claims are recorded here and they should not be blurred.
+  Prismic's SECURITY/COMPLIANCE posture is genuinely published and named
+  (https://prismic.io/legal/security). Its API STANDARDS conformance is thin: no
+  OpenAPI, no AsyncAPI, no RFC 9457, no rate-limit headers. The strong result is
+  in the middle — the two OAuth discovery RFCs, which were verified live rather
+  than claimed.
+standards:
+  # --- verified live -------------------------------------------------------
+  - id: oauth2
+    conforms: true
+    evidence: >-
+      Two independent OAuth surfaces. (1) The MCP server publishes RFC 8414
+      authorization-server metadata with authorization_code + refresh_token
+      grants and S256 PKCE. (2) Every Prismic repository advertises its own
+      oauth_initiate/oauth_token endpoints in the Repository API root document.
+    verified: probed
+    artifact: authentication/prismic-authentication.yml
+  - id: rfc8414-oauth-authorization-server-metadata
+    conforms: true
+    evidence: 'GET https://mcp.prismic.io/.well-known/oauth-authorization-server ->
+      HTTP 200, valid metadata document'
+    verified: probed
+    file: well-known/prismic-mcp-oauth-authorization-server.json
+  - id: rfc9728-oauth-protected-resource-metadata
+    conforms: true
+    evidence: 'GET https://mcp.prismic.io/.well-known/oauth-protected-resource -> HTTP
+      200, {"resource":"https://mcp.prismic.io/mcp","authorization_servers":["https://mcp.prismic.io/"]}'
+    verified: probed
+    file: well-known/prismic-mcp-oauth-protected-resource.json
+  - id: oauth2-dynamic-client-registration
+    conforms: true
+    evidence: registration_endpoint https://mcp.prismic.io/register advertised in the
+      authorization-server metadata
+    verified: probed
+  - id: pkce-s256
+    conforms: true
+    evidence: '"code_challenge_methods_supported":["S256"]'
+    verified: probed
+  - id: mcp
+    conforms: true
+    evidence: >-
+      A remote MCP server at https://mcp.prismic.io/mcp with 16 documented tools,
+      OAuth-protected. GET returns 405 (POST-only JSON-RPC); anonymous
+      tools/list returns 401.
+    verified: probed
+    artifact: mcp/prismic-mcp.yml
+  - id: graphql
+    conforms: true
+    evidence: >-
+      Full GraphQL introspection succeeded anonymously against a public Prismic
+      repository (HTTP 200, 6,133 types). Relay-style connections with
+      PageInfo/edges/cursor. Read-only — no mutation or subscription root type.
+    verified: probed
+    artifact: graphql/prismic-base-schema.graphql
+    deviations:
+      - Requires GET rather than POST, and a `Prismic-Ref` header naming the content
+        version.
+      - No mutations and no subscriptions — the schema exposes a Query root only.
+  - id: agent-skills
+    conforms: true
+    evidence: 'Prismic publishes a packaged Agent Skill at github.com/prismicio/skills
+      (skills/prismic/SKILL.md), installed with `npx skills add --global prismicio/skills`.'
+    verified: searched
+    artifact: skills/_index.yml
+  - id: llms-txt
+    conforms: true
+    evidence: 'https://prismic.io/llms.txt -> HTTP 200; https://prismic.io/docs/llms.txt
+      -> HTTP 200. Every docs page is also served as markdown at a `.md` suffix.'
+    verified: probed
+    artifact: llms/prismic-llms.txt
+  # --- verified absent -----------------------------------------------------
+  - id: openapi
+    conforms: false
+    evidence: >-
+      No OpenAPI or Swagger document is published for any of the seven HTTP APIs.
+      /openapi.json, /openapi.yaml, /swagger.json, /api-docs and /redoc were
+      probed on prismic.io, customtypes.prismic.io, asset-api.prismic.io and
+      migration.prismic.io — all 403/404. Prismic's own "API References" page
+      lists the seven APIs as prose documentation only.
+    verified: probed
+  - id: asyncapi
+    conforms: false
+    evidence: No AsyncAPI document published. Webhooks are documented in prose; see
+      asyncapi/prismic-webhooks.yml.
+    verified: probed
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: >-
+      No error envelope of any kind is published. Observed error bodies come from
+      three different gateways (AWS API Gateway, Kong, the CDN) in three different
+      shapes, none of them application/problem+json.
+    verified: probed
+    artifact: errors/prismic-error-codes.yml
+  - id: rfc9331-ratelimit-headers
+    conforms: false
+    evidence: No X-RateLimit-*/RateLimit-* headers and no Retry-After are documented
+      on any surface.
+    artifact: rate-limits/prismic-rate-limits.yml
+  - id: rfc9116-security-txt
+    conforms: false
+    evidence: /.well-known/security.txt probed on six Prismic hosts — 404 or 403 on
+      every one.
+    verified: probed
+    artifact: well-known/prismic-well-known.yml
+  - id: rfc8594-sunset-header
+    conforms: false
+    evidence: No deprecation policy and no Sunset/Deprecation header documentation.
+    artifact: lifecycle/prismic-lifecycle.yml
+  - id: a2a
+    conforms: false
+    evidence: /.well-known/agent-card.json and /.well-known/agent.json probed on six
+      hosts — no agent card served.
+    verified: probed
+  - id: idempotency-key
+    conforms: false
+    evidence: No idempotency key on any write surface.
+    artifact: conventions/prismic-conventions.yml
+  - id: openid-connect
+    conforms: false
+    evidence: /.well-known/openid-configuration returns 404 on every host including
+      mcp.prismic.io. Identity is brokered by Auth0 (prismic-auth.eu.auth0.com) but
+      no OIDC discovery document is exposed under a Prismic hostname.
+    verified: probed
+compliance:
+  published: false
+  url: https://prismic.io/legal/security
+  certifications: []
+  artifact: security/prismic-trust-center.yml
+  note: >-
+    Prismic publishes a detailed security PRACTICES page but holds no named
+    certification of its own — no SOC 2, no ISO 27001, no PCI, no audited
+    attestation of any kind. Every certification named on that page belongs to a
+    third party and Prismic says so: ISO 27001/27017/27018, PCI-DSS L1, SOC 1/2/3
+    and CSA STAR are listed as AWS's (its host), and PCI is explicitly outsourced
+    to Stripe. A prior automated pass keyword-matched those names and credited
+    them to Prismic; that is corrected in
+    security/prismic-trust-center.yml. Consequently NO `Compliance` pointer is
+    wired in apis.yml — the artifact records an honest absence, not a program.
+  published_practices: [yearly external penetration tests, continuous vulnerability
+      scanning, periodic external security audits, secure development lifecycle with
+      peer review, annual employee security training, documented incident response
+      plan, three-AZ redundancy with point-in-time recovery]
+regulatory_context:
+  gdpr: claimed on the security page; DPA not yet available online (Enterprise, via
+    Account Manager)
+  sso: Enterprise tier only (OAuth2 / AD / Okta)
+  data_residency: AWS us-east-1 only — single region, no customer choice offered
+  hipaa: not claimed
+  fedramp: not claimed
+  pci: outsourced to Stripe; Prismic is not a PCI entity

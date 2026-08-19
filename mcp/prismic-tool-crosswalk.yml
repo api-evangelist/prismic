@@ -1,0 +1,193 @@
+generated: '2026-08-13'
+method: derived
+source: mcp/prismic-mcp.yml + https://prismic.io/docs/apis.md (the seven documented
+  HTTP APIs) + graphql/prismic-base-schema.graphql
+note: >-
+  Prismic publishes NO OpenAPI for any of its seven HTTP APIs, so there are no
+  operationIds to bind against. Each row therefore binds an MCP tool to the
+  documented HTTP method + path of the REST endpoint that covers the same
+  capability, and to the GraphQL root field where one exists. Confidence is set
+  on how exactly the documented REST surface covers the tool, not on how
+  plausible the mapping sounds. Nothing here was inferred from a live tools/list
+  response — that endpoint is OAuth-gated (HTTP 401 anonymous).
+surfaces:
+  rest:
+    spec: none published
+    apis:
+      - {name: Content API, base: 'https://{repo}.cdn.prismic.io/api/v2', docs: 'https://prismic.io/docs/content-api',
+         gated: false}
+      - {name: Repository API, base: 'https://{repo}.cdn.prismic.io/api/v2', docs: 'https://prismic.io/docs/repository-api-technical-reference',
+         gated: false}
+      - {name: Tags API, base: 'https://{repo}.cdn.prismic.io/api/tags', docs: 'https://prismic.io/docs/tags-api-technical-reference',
+         gated: false, status: beta}
+      - {name: Types API, base: 'https://customtypes.prismic.io', docs: 'https://prismic.io/docs/custom-types-api',
+         gated: true, auth: bearer write token}
+      - {name: Asset API, base: 'https://asset-api.prismic.io', docs: 'https://prismic.io/docs/asset-api-technical-reference',
+         gated: true, auth: bearer write token}
+      - {name: Migration API, base: 'https://migration.prismic.io', docs: 'https://prismic.io/docs/migration-api-technical-reference',
+         gated: true, auth: bearer write token}
+  graphql:
+    endpoint: https://{repo}.cdn.prismic.io/graphql
+    introspection: open (anonymous introspection succeeded against Prismic's own public
+      repository, HTTP 200)
+    sdl: graphql/prismic-base-schema.graphql
+    note: read-only; per-repository dynamic schema
+  mcp:
+    url: https://mcp.prismic.io/mcp
+    tools_list: gated (HTTP 401 without OAuth)
+    manifest: mcp/prismic-mcp.yml
+crosswalk:
+  - tool: list_custom_types
+    category: discovery
+    rest: ['GET https://customtypes.prismic.io/customtypes']
+    graphql: null
+    binding: rest
+    confidence: high
+    note: The Repository API also returns a `types` id->label map anonymously, which
+      is a thinner but unauthenticated equivalent.
+  - tool: list_shared_slices
+    category: discovery
+    rest: ['GET https://customtypes.prismic.io/slices']
+    binding: rest
+    confidence: high
+  - tool: list_locales
+    category: discovery
+    rest: ['GET https://{repo}.cdn.prismic.io/api/v2 -> languages[]']
+    binding: rest
+    confidence: high
+    note: Field-level binding, not a dedicated endpoint — locales are a property of
+      the Repository API root document.
+  - tool: list_releases
+    category: discovery
+    rest: ['GET https://{repo}.cdn.prismic.io/api/v2 -> refs[]']
+    binding: rest
+    confidence: medium
+    note: >-
+      Releases surface as entries in the Repository API `refs` array, but only
+      when the request carries a master+releases access token or the repository
+      is set to Open API visibility. The MCP tool returns releases directly and
+      newest-first; the REST equivalent returns refs in repository order.
+  - tool: search_documents
+    category: read
+    rest: ['GET https://{repo}.cdn.prismic.io/api/v2/documents/search?ref=&q=']
+    graphql: [_allDocuments]
+    binding: rest+graphql
+    confidence: high
+    note: >-
+      REST filters (`q`), `orderings`, `page`/`pageSize`, `lang` and `fetchLinks`
+      are the parameter surface behind the tool's type / locale / status / tag
+      filters. GraphQL `_allDocuments` covers the same query with
+      cursor pagination instead of page numbers.
+  - tool: get_document
+    category: read
+    rest: ['GET https://{repo}.cdn.prismic.io/api/v2/documents/search?ref=&q=[[at(document.id,"...")]]']
+    graphql: ['<type_id>(uid:, lang:)']
+    binding: rest+graphql
+    confidence: high
+    note: >-
+      No by-id GET route exists; the documented pattern is a `search` query with
+      an `at(document.id, ...)` filter. Reading a specific VERSION or RELEASE
+      maps to passing that release's `ref`.
+  - tool: get_custom_type
+    category: read
+    rest: ['GET https://customtypes.prismic.io/customtypes/{customTypeId}']
+    binding: rest
+    confidence: high
+    note: The MCP tool additionally returns an empty content template, which the REST
+      route does not produce — the model JSON is the same, the template is composed
+      server-side.
+  - tool: get_shared_slice
+    category: read
+    rest: ['GET https://customtypes.prismic.io/slices/{sliceId}']
+    binding: rest
+    confidence: high
+    note: Same divergence as get_custom_type — ready-to-use empty variation bodies
+      are MCP-side composition over the same model.
+  - tool: search_assets
+    category: read
+    rest: ['GET https://asset-api.prismic.io/assets?keyword=&assetType=&limit=&cursor=']
+    binding: rest
+    confidence: high
+  - tool: create_document
+    category: write
+    rest: ['POST https://migration.prismic.io/documents']
+    binding: rest
+    confidence: high
+    note: Both write into a release rather than to live content.
+  - tool: update_document
+    category: write
+    rest: ['PUT https://migration.prismic.io/documents/{id}']
+    binding: rest
+    confidence: medium
+    note: >-
+      The Migration API PUT replaces `data` wholesale and ignores `type`, `lang`
+      and `alternate_language_id`. The MCP tool branches a new version from a
+      named base version, which the REST route has no parameter for.
+  - tool: upload_asset
+    category: write
+    rest: ['POST https://asset-api.prismic.io/assets']
+    binding: rest
+    confidence: medium
+    note: >-
+      REST takes a multipart/form-data file body; the MCP tool takes a URL and
+      fetches the asset server-side. Same destination, different input contract.
+mcp_only:
+  - tool: list_repositories
+    reason: >-
+      Account-level listing. No public HTTP API exposes the set of repositories a
+      Prismic user can access — every documented REST API is scoped to one
+      repository, named in the host or the `repository` header.
+  - tool: list_document_versions
+    reason: >-
+      No public REST or GraphQL surface returns a document's version history
+      (drafts, archived, per-release versions). The Content API addresses versions
+      only indirectly, by querying with a different `ref`.
+  - tool: create_release
+    reason: >-
+      No public REST endpoint creates a release. Releases are created in the Page
+      Builder, or implicitly as a migration release by the Migration API.
+  - tool: publish_release
+    reason: >-
+      No public REST endpoint publishes a release. The only non-MCP programmatic
+      path is `@prismicio/client`'s publishMigrationRelease(), which is
+      SDK-mediated and limited to migration releases — and migration releases are
+      exactly what MCP cannot publish. The two surfaces are complementary, not
+      overlapping.
+rest_only:
+  - capability: content modelling — write
+    endpoints:
+      - POST https://customtypes.prismic.io/customtypes/insert
+      - POST https://customtypes.prismic.io/customtypes/update
+      - DELETE https://customtypes.prismic.io/customtypes/{customTypeId}
+      - POST https://customtypes.prismic.io/slices/insert
+      - POST https://customtypes.prismic.io/slices/update
+      - DELETE https://customtypes.prismic.io/slices/{sliceId}
+    note: >-
+      MCP can READ models (get_custom_type, get_shared_slice) but cannot create,
+      update or delete them. Prismic routes model authoring at agents through the
+      CLI skill (`npx prismic push`) instead — see skills/.
+  - capability: asset metadata + deletion
+    endpoints:
+      - PATCH https://asset-api.prismic.io/assets/{asset-id}
+      - DELETE https://asset-api.prismic.io/assets/{asset-id}
+  - capability: repository tags
+    endpoints: ['GET https://{repo}.cdn.prismic.io/api/tags']
+    note: Beta, activation-gated. `search_documents` filters BY tag but no tool lists
+      the tag vocabulary.
+  - capability: ref / OAuth discovery
+    endpoints: ['GET https://{repo}.cdn.prismic.io/api/v2 -> refs[], oauth_initiate,
+        oauth_token, license, version']
+    note: Refs are plumbing the MCP server handles internally.
+  - capability: selective + deep field fetching
+    endpoints: ['GraphQL https://{repo}.cdn.prismic.io/graphql']
+    note: >-
+      GraphQL's whole reason for existing at Prismic — fetching only chosen
+      fields and following content relationships in one round trip — has no MCP
+      equivalent. `get_document` returns full content.
+coverage:
+  mcp_tools_total: 16
+  mcp_tools_bound_to_rest: 12
+  mcp_only: 4
+  rest_capability_groups_without_a_tool: 5
+  rest_operations_with_an_openapi_operationid: 0
+  graphql_root_fields_bound: 2

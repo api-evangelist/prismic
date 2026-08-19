@@ -1,0 +1,184 @@
+generated: '2026-08-13'
+method: derived
+source: graphql/prismic-base-schema.graphql + live Repository API response + https://prismic.io/docs/apis.md
+derivation: >-
+  No OpenAPI exists to walk $refs through, so the entity graph was derived from
+  three real sources instead: (1) the live GraphQL introspection of a public
+  Prismic repository, which gives the built-in `_Document`, `_Linkable`, `Meta`
+  and connection types verbatim; (2) a live GET of
+  https://prismic-main.cdn.prismic.io/api/v2 (HTTP 200), whose response body is
+  itself the Repository entity with its refs, types, languages and OAuth
+  endpoints; and (3) the documented request/response bodies of the Types, Asset
+  and Migration APIs. Nothing here is invented — every field named below appears
+  in one of those three.
+model_note: >-
+  Prismic's data model is two-layered and that is the thing to understand before
+  calling anything. The CONTENT MODEL layer (custom types and shared slices) is
+  itself user-defined data, edited through the Types API, the CLI or Slice
+  Machine — and it is what generates the runtime GraphQL schema and the shape of
+  every Document's `data`. So the "schema" is content. A Document validates
+  against a CustomType that the same customer authored, which is why the GraphQL
+  introspection of one repository returned 6,133 types and would return a
+  completely different set for another.
+entities:
+  - name: Repository
+    description: The top-level container. One repository = one content database, one
+      set of models, one API host.
+    id_field: domain (the repository name, e.g. `your-repo-name`)
+    surfaced_by: 'GET https://{repo}.cdn.prismic.io/api/v2'
+    fields: [refs, bookmarks (deprecated), experiments (deprecated), types, languages,
+      forms, oauth_initiate, oauth_token, tags (deprecated), license, version]
+    relationships:
+      - {type: has_many, target: Ref, via: refs}
+      - {type: has_many, target: CustomType, via: types}
+      - {type: has_many, target: Locale, via: languages}
+      - {type: has_many, target: Document}
+      - {type: has_many, target: Asset}
+      - {type: has_many, target: Webhook}
+  - name: Ref
+    description: >-
+      A pointer to a specific version of the whole repository's content. The
+      master ref is the live version; each Release also has a ref. Every Content
+      API and GraphQL read is addressed to one.
+    id_field: ref (opaque, e.g. an3eUxEAACcAexk-)
+    fields: [id, ref, label, isMasterRef, scheduledAt]
+    lifecycle: A new master ref is minted on every publish; old refs are eventually
+      purged.
+    relationships:
+      - {type: belongs_to, target: Repository}
+      - {type: has_one, target: Release, via: id, note: 'a non-master ref IS a release
+          ref'}
+  - name: Release
+    description: A named, optionally scheduled batch of document changes. Everything
+      written by the Migration API or the MCP server lands in one.
+    fields: [id, ref, label, scheduledAt, documents]
+    kinds: [manual release, scheduled release, migration release]
+    relationships:
+      - {type: belongs_to, target: Repository}
+      - {type: has_many, target: Document, via: documents}
+      - {type: has_one, target: Ref, via: ref}
+  - name: Document
+    aliases: [Page]
+    description: A single piece of content. Called a "page" in the marketing UI and
+      in the CLI; called a document in the API.
+    id_field: id (16-character opaque alphanumeric, e.g. ZMI65RQAADkECUFM)
+    natural_key: uid (unique within a type)
+    surfaced_by:
+      - 'GET https://{repo}.cdn.prismic.io/api/v2/documents/search'
+      - 'GraphQL _allDocuments / <type_id>'
+      - 'POST https://migration.prismic.io/documents'
+      - 'PUT https://migration.prismic.io/documents/{id}'
+    fields: [id, uid, url, type, href, tags, first_publication_date, last_publication_date,
+      slugs, lang, alternate_languages, data]
+    graphql_meta: _meta {id, uid, type, tags, lang, alternateLanguages, firstPublicationDate,
+      lastPublicationDate}
+    relationships:
+      - {type: belongs_to, target: CustomType, via: type}
+      - {type: belongs_to, target: Locale, via: lang}
+      - {type: has_many, target: Document, via: alternate_languages, note: 'translations
+          of one another; the link can only be established at creation time via
+          alternate_language_id'}
+      - {type: has_many, target: Document, via: 'content relationship / link fields
+          (link_type: Document)'}
+      - {type: has_many, target: Asset, via: 'image and media link fields (link_type:
+          Media)'}
+      - {type: has_many, target: Slice, via: slice zones}
+      - {type: has_many, target: Tag, via: tags}
+      - {type: belongs_to, target: Release, note: while staged}
+  - name: CustomType
+    aliases: [Type, Page type, Content model]
+    description: The model a Document validates against. User-authored, versioned in
+      the customer's own repo via the CLI, and the generator of the runtime GraphQL
+      types.
+    id_field: id (API ID, e.g. `page`)
+    surfaced_by: 'GET/POST/DELETE https://customtypes.prismic.io/customtypes'
+    fields: [id, label, repeatable, json, status, format]
+    status_semantics: '`status: true` = active in the repository; `status: false` =
+      disabled and hidden.'
+    relationships:
+      - {type: belongs_to, target: Repository}
+      - {type: has_many, target: Document}
+      - {type: has_many, target: Slice, via: 'slice zones declared in `json`'}
+      - {type: has_many, target: Field, via: json}
+  - name: Slice
+    aliases: [Shared slice]
+    description: A reusable page section. Shared slices are Slice Machine artefacts
+      with named variations; a Document's slice zone is an ordered array of slice instances.
+    id_field: id (e.g. `image_gallery`)
+    surfaced_by: 'GET/POST/DELETE https://customtypes.prismic.io/slices'
+    fields: [id, type (SharedSlice), name, description, variations]
+    variation_fields: [id, name, docURL, version, description, primary, items, imageUrl]
+    relationships:
+      - {type: belongs_to, target: Repository}
+      - {type: has_many, target: SliceVariation, via: variations}
+      - {type: has_many, target: Field, via: 'variation.primary and variation.items'}
+      - {type: belongs_to, target: CustomType, note: via availability in a slice zone}
+  - name: Field
+    description: >-
+      A typed value inside a Document, a group, or a slice variation. Eighteen
+      field types are documented, each with its own configuration and its own
+      Migration API value shape.
+    types: [Boolean, Color, Content Relationship, Date, Embed, Geopoint, Group, Image,
+      Integration, Key text, Link, Link to Media, Number, Repeatable group, Rich Text,
+      Select, Table, Text, Timestamp, UID]
+    docs: https://prismic.io/docs/page-fields
+    relationships:
+      - {type: belongs_to, target: CustomType}
+      - {type: belongs_to, target: Slice}
+      - {type: has_one, target: Asset, via: 'Image / Link to Media field `id`'}
+      - {type: has_one, target: Document, via: 'Content Relationship / Link field `id`'}
+  - name: Asset
+    description: A file in the repository's media library.
+    id_field: id (e.g. ZMgV5hAAAEADVsPS)
+    surfaced_by: GET/POST/PATCH/DELETE https://asset-api.prismic.io/assets
+    fields: [id, url, filename, size, width, height, last_modified, kind, extension,
+      notes, credits, alt, created_at]
+    metadata_limits: notes / credits / alt each capped at 500 characters
+    cdn: served through prismic-io.imgix.net with auto=format,compress
+    relationships:
+      - {type: belongs_to, target: Repository}
+      - {type: has_many, target: Document, via: 'referenced by image and media-link
+          fields'}
+  - name: Locale
+    aliases: [Language]
+    description: A language/region a repository publishes in. One is the master locale.
+    id_field: id (e.g. en-us)
+    fields: [id, name, is_master]
+    surfaced_by: 'GET /api/v2 -> languages[]; `npx prismic locale`'
+    relationships:
+      - {type: belongs_to, target: Repository}
+      - {type: has_many, target: Document, via: lang}
+  - name: Tag
+    description: A free-form label on a Document. The tag vocabulary is emergent, not
+      modelled.
+    surfaced_by: 'GET https://{repo}.cdn.prismic.io/api/tags (beta)'
+    relationships:
+      - {type: has_many, target: Document}
+  - name: Webhook
+    description: An outbound HTTP subscription fired on publish, release and tag changes.
+    fields: [url, triggers, secret]
+    surfaced_by: '`npx prismic webhook`; Settings > Webhooks. No HTTP API.'
+    detail: asyncapi/prismic-webhooks.yml
+    relationships:
+      - {type: belongs_to, target: Repository}
+  - name: Preview
+    description: A configured environment URL for viewing draft content before publish.
+    surfaced_by: '`npx prismic preview`'
+    relationships:
+      - {type: belongs_to, target: Repository}
+link_types:
+  note: >-
+    The `_Linkable` GraphQL interface and the REST `link_type` discriminator are
+    the same polymorphic concept expressed twice.
+  graphql_implementations: [_ExternalLink, _FileLink, _ImageLink, '<any document type>']
+  rest_discriminator_values: [Web, Document, Media, Any]
+id_conventions:
+  document_id: 16-character opaque base64-ish string, no type prefix
+  asset_id: same shape as a document id
+  ref: opaque, sometimes two hashes joined by `~` for release refs
+  custom_type_id: human-authored snake_case API ID
+  note: >-
+    Prismic ids are NOT prefixed by entity type. A bare id is ambiguous between a
+    Document and an Asset — the caller must know from context which API to send
+    it to.
+render: null

@@ -1,0 +1,107 @@
+generated: '2026-08-13'
+method: probed
+source: live GET probes of every Prismic host named in apis.yml, the docs, and the
+  MCP server documentation
+note: >-
+  Eight /.well-known/ paths were probed on six Prismic hosts (48 requests). Only
+  the MCP server host, mcp.prismic.io, serves any well-known document: the two
+  OAuth discovery documents that back its remote MCP endpoint. prismic.io is a
+  Next.js SPA whose catch-all returns a full HTML error page (~202 KB) with a 404
+  status for every /.well-known/* path — a miss, not a document. The Content /
+  Types / Asset API hosts sit behind AWS API Gateway and Kong and answer 403/404
+  with a JSON deny message on unrouted paths. No security.txt is served on any
+  host; no API catalog; no agent card.
+hosts:
+  - host: https://mcp.prismic.io
+    role: MCP server (remote, OAuth-protected)
+    documents:
+      - path: /.well-known/oauth-authorization-server   # RFC 8414
+        status: 200
+        content_type: application/json
+        file: prismic-mcp-oauth-authorization-server.json
+      - path: /.well-known/oauth-protected-resource     # RFC 9728
+        status: 200
+        content_type: application/json
+        file: prismic-mcp-oauth-protected-resource.json
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://prismic.io
+    role: website + documentation
+    note: SPA catch-all — every path below returned HTTP 404 with an HTML body.
+    documents:
+      - {path: /.well-known/security.txt, status: 404, body: html}
+      - {path: /.well-known/openid-configuration, status: 404, body: html}
+      - {path: /.well-known/oauth-authorization-server, status: 404, body: html}
+      - {path: /.well-known/oauth-protected-resource, status: 404, body: html}
+      - {path: /.well-known/api-catalog, status: 404, body: html}
+      - {path: /.well-known/ai-plugin.json, status: 404, body: html}
+      - {path: /.well-known/agent-card.json, status: 404, body: html}
+      - {path: /.well-known/agent.json, status: 404, body: html}
+  - host: https://prismic-main.cdn.prismic.io
+    role: Content / Repository / Tags / GraphQL API (Prismic's own public repository)
+    note: All eight paths returned 403 with a short non-HTML deny body.
+    documents:
+      - {path: /.well-known/security.txt, status: 403}
+      - {path: /.well-known/openid-configuration, status: 403}
+      - {path: /.well-known/oauth-authorization-server, status: 403}
+      - {path: /.well-known/oauth-protected-resource, status: 403}
+      - {path: /.well-known/api-catalog, status: 403}
+      - {path: /.well-known/ai-plugin.json, status: 403}
+      - {path: /.well-known/agent-card.json, status: 403}
+      - {path: /.well-known/agent.json, status: 403}
+  - host: https://customtypes.prismic.io
+    role: Types API
+    note: 'AWS API Gateway explicit deny on all eight paths: {"message":"User is not
+      authorized to access this resource with an explicit deny in an identity-based
+      policy"}'
+    documents:
+      - {path: /.well-known/security.txt, status: 403}
+      - {path: /.well-known/openid-configuration, status: 403}
+      - {path: /.well-known/oauth-authorization-server, status: 403}
+      - {path: /.well-known/oauth-protected-resource, status: 403}
+      - {path: /.well-known/api-catalog, status: 403}
+      - {path: /.well-known/ai-plugin.json, status: 403}
+      - {path: /.well-known/agent-card.json, status: 403}
+      - {path: /.well-known/agent.json, status: 403}
+  - host: https://asset-api.prismic.io
+    role: Asset API
+    note: 403 deny, then 429 (the Asset API is rate limited to one request per second,
+      which the probe itself tripped) — either way, no document served.
+    documents:
+      - {path: /.well-known/security.txt, status: 403}
+      - {path: /.well-known/openid-configuration, status: 429}
+      - {path: /.well-known/oauth-authorization-server, status: 429}
+      - {path: /.well-known/oauth-protected-resource, status: 429}
+      - {path: /.well-known/api-catalog, status: 429}
+      - {path: /.well-known/ai-plugin.json, status: 429}
+      - {path: /.well-known/agent-card.json, status: 429}
+      - {path: /.well-known/agent.json, status: 403}
+  - host: https://migration.prismic.io
+    role: Migration API
+    note: 'Kong gateway: {"message":"no Route matched with those values"} on all eight
+      paths.'
+    documents:
+      - {path: /.well-known/security.txt, status: 404}
+      - {path: /.well-known/openid-configuration, status: 404}
+      - {path: /.well-known/oauth-authorization-server, status: 404}
+      - {path: /.well-known/oauth-protected-resource, status: 404}
+      - {path: /.well-known/api-catalog, status: 404}
+      - {path: /.well-known/ai-plugin.json, status: 404}
+      - {path: /.well-known/agent-card.json, status: 404}
+      - {path: /.well-known/agent.json, status: 404}
+summary:
+  paths_probed: 48
+  documents_served: 2
+  security_txt: false
+  api_catalog: false
+  agent_card: false

@@ -1,0 +1,61 @@
+generated: '2026-08-13'
+method: searched
+source: https://github.com/prismicio/skills
+note: >-
+  Prismic PUBLISHES its own Agent Skill. Nothing in this directory was authored
+  by API Evangelist — `prismic-prismic-cli.md` is the verbatim contents of
+  skills/prismic/SKILL.md from Prismic's own repository, saved unmodified. The
+  skill is installed with `npx skills add --global --yes prismicio/skills` and is
+  documented at https://prismic.io/docs/ai.
+install: npx skills add --global --yes prismicio/skills
+repository: https://github.com/prismicio/skills
+repository_description: Agent skills for Prismic. Compatible with Claude Code, Codex,
+  Cursor, and others.
+license: Apache-2.0
+docs: https://prismic.io/docs/ai
+launched: '2026-06-08'
+launch_note: https://prismic.io/updates/cli
+skills:
+  - file: prismic-prismic-cli.md
+    name: prismic
+    provider_published: true
+    source: https://raw.githubusercontent.com/prismicio/skills/main/skills/prismic/SKILL.md
+    fetched: '2026-08-13'
+    description: >-
+      Use whenever Prismic is mentioned or relevant in any way — including
+      questions, lookups, configuration, repository settings, content modeling,
+      content types, slices, localization, previews, API tokens, webhooks,
+      syncing local models, or reading Prismic documentation.
+    allowed_tools: ['Bash(npx prismic *)']
+    grounds_in: cli/prismic-prismic-cli.yml
+    posture: >-
+      The skill deliberately grounds the agent in the CLI rather than in the HTTP
+      APIs: it instructs the agent to discover commands with `npx prismic --help`
+      rather than guess, to read documentation with `npx prismic docs list` /
+      `npx prismic docs view <path>`, to prefer CLI workflows over direct API or
+      manual changes, to never hand-edit model JSON, and to say so explicitly
+      when the CLI cannot do what was asked instead of improvising.
+related_agent_surfaces:
+  - kind: MCP server
+    url: https://mcp.prismic.io/mcp
+    artifact: mcp/prismic-mcp.yml
+    note: The skill covers MODELLING and CONFIGURATION via the CLI; the MCP server
+      covers CONTENT read/write. They are separate agent surfaces with almost no
+      overlap.
+  - kind: agentic migration starter
+    url: https://github.com/prismicio-community/agentic-migration-starter
+    note: >-
+      A Prismic-community AI-agent project that automates CMS-to-Prismic content
+      migration through three slash-command agents (/export-and-analyze,
+      /bootstrap-models, /script-migration). Documented at
+      https://prismic.io/docs/migration. Not a packaged Agent Skill, so it is
+      recorded here rather than as a skill file.
+  - kind: llms.txt
+    url: https://prismic.io/llms.txt
+    artifact: llms/prismic-llms.txt
+  - kind: markdown documentation twins
+    pattern: https://prismic.io/docs/<page>.md
+    note: >-
+      Every documentation page is served as clean markdown at a `.md` suffix
+      (verified on 12 pages, all HTTP 200). Prismic states plainly in llms.txt
+      that "Prismic's documentation is written for humans and AI agents."

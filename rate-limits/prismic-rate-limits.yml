@@ -1,0 +1,106 @@
+generated: '2026-08-13'
+method: searched
+source: https://prismic.io/docs/content-api
+docs:
+  - https://prismic.io/docs/content-api#limits
+  - https://prismic.io/docs/asset-api-technical-reference#limits
+  - https://prismic.io/docs/migration-api-technical-reference#limits
+  - https://prismic.io/pricing
+supersedes: rate-limits/prismic-rate-limits.md
+limit_count: 4
+response_headers:
+  rate_limit_headers: none
+  retry_after: not documented
+  note: >-
+    THE HEADLINE FINDING. Prismic publishes its limits as numbers in prose but
+    documents NO rate-limit response headers — no `X-RateLimit-*`, no
+    `RateLimit-*` (RFC 9331), and no `Retry-After` on the 429. An agent therefore
+    has no runtime signal of how much budget is left; it discovers the limit only
+    by being refused. Prismic's own answer to this is client-side rather than
+    protocol-level: `@prismicio/client` v5+ catches the 429 and blind-retries
+    after one second. A non-JavaScript consumer, or an agent calling the HTTP API
+    directly, gets nothing.
+limits:
+  - scope: per-repository
+    api: Content API
+    surface: uncached requests
+    limit: 200
+    window: 1 second
+    burst: not published
+    status_on_exhaustion: 429
+    source: https://prismic.io/docs/content-api#limits
+    note: >-
+      Applies only to requests that miss the CDN. Prismic names three ways to hit
+      it: writing a custom client that bypasses the CDN, manually invalidating the
+      cache in rapid succession, or firing hundreds of distinct queries right
+      after a publish.
+  - scope: per-repository
+    api: Content API
+    surface: cached CDN requests (.cdn.prismic.io)
+    limit: unlimited
+    window: n/a
+    source: https://prismic.io/docs/content-api#limits
+    note: >-
+      Cached queries have no rate limit AND do not consume the plan's monthly
+      API-call quota. Host choice is therefore both a performance and a billing
+      decision.
+  - scope: per-host
+    api: Asset API
+    limit: 1
+    window: 1 second
+    payload_limit: one asset per request
+    status_on_exhaustion: 429
+    source: https://prismic.io/docs/asset-api-technical-reference#limits
+    observed: >-
+      Confirmed live on 2026-08-13 — eight sequential probes of
+      https://asset-api.prismic.io/.well-known/* returned 429 from the second
+      request onward, so the limit is enforced on unauthenticated paths too.
+  - scope: per-repository
+    api: Migration API
+    limit: 1
+    window: 1 second
+    payload_limit: one page per request
+    source: https://prismic.io/docs/migration-api-technical-reference#limits
+    note: >-
+      One page per second is the binding constraint on any large migration. A
+      10,000-page migration is a ~3-hour floor before any other consideration.
+      Separately, `writeClient.migrate()` and a migration release each cap at
+      1,000 pages at a time; Prismic recommends batching per locale beyond that.
+query_limits:
+  - {api: Content API, limit: 'max URL length 2048 characters', note: 'filters,
+      orderings, routes and fetchLinks are all URL-encoded query parameters, so this
+      is the practical ceiling on query complexity'}
+  - {api: Content API, limit: 'pageSize max 100 (default 20)'}
+  - {api: GraphQL API, limit: 'first / last max 100 items per query'}
+plan_quotas:
+  unit: API calls per month
+  note: >-
+    A separate, orthogonal limit from the per-second rate limit. Cached CDN reads
+    do not count against it. Values below are from Prismic's own pricing data
+    (see plans/prismic-plans-pricing.yml, read live from their Content API).
+  tiers:
+    - {plan: Free, api_calls_month: 4000000, overages: none}
+    - {plan: Starter, api_calls_month: 4000000, overages: none}
+    - {plan: Small, api_calls_month: 4000000, overages: none}
+    - {plan: Medium, api_calls_month: 5000000, overages: none}
+    - {plan: Platinum, api_calls_month: 10000000, overages: 'paid, up to 20 million
+        on yearly invoiced plans'}
+    - {plan: Enterprise, api_calls_month: custom, overages: custom}
+bandwidth_quotas:
+  unit: CDN bandwidth per month
+  tiers:
+    - {plan: Free, included: 100 GB, overages: none}
+    - {plan: Starter, included: 100 GB, overages: 'paid up to 500 GB at $0.30/GB'}
+    - {plan: Small, included: 100 GB, overages: 'paid up to 500 GB at $0.30/GB'}
+    - {plan: Medium, included: 500 GB, overages: 'paid up to 1 TB at $0.30/GB'}
+    - {plan: Platinum, included: 1 TB, overages: 'paid up to 5 TB at $0.25/GB'}
+    - {plan: Enterprise, included: custom, overages: custom}
+mcp_limits:
+  published: false
+  note: No rate limits are published for the MCP server at https://mcp.prismic.io/mcp.
+gaps:
+  - No rate-limit response headers on any surface.
+  - No documented `Retry-After` on 429.
+  - No published limits for the Types API or the Repository API.
+  - No published limits for the MCP server.
+  - No burst allowance published for the 200/second Content API limit.

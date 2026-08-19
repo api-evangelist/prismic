@@ -1,0 +1,139 @@
+generated: '2026-08-13'
+method: searched
+status: published
+source: https://prismic.io/docs/mcp
+deployment:
+  mode: remote
+  endpoint: https://mcp.prismic.io/mcp
+  auth: oauth
+  verified: probed
+  evidence:
+    - {url: 'https://mcp.prismic.io/mcp', method: GET, http_status: 405, body: 'Method
+        not allowed'}
+    - {url: 'https://mcp.prismic.io/mcp', method: 'POST tools/list', http_status: 401,
+       body: '{"error":"Unauthorized"}'}
+    - {url: 'https://mcp.prismic.io/.well-known/oauth-protected-resource', http_status: 200}
+    - {url: 'https://mcp.prismic.io/.well-known/oauth-authorization-server', http_status: 200}
+server:
+  name: Prismic MCP Server
+  transport: http
+  url: https://mcp.prismic.io/mcp
+  docs: https://prismic.io/docs/mcp
+  launched: '2026-06-08'
+  launch_note: https://prismic.io/updates/mcp
+  activation_required: true
+  activation_note: >-
+    MCP must be activated per repository in the Prismic dashboard under
+    Settings > Prismic MCP before the server can search or write that
+    repository's content.
+  identity_model: >-
+    The server authenticates as the signed-in Prismic user, so an agent only
+    reaches repositories that account can already access. `publish_release`
+    additionally requires a Publisher (Manager) role.
+  documented_clients: [Claude, ChatGPT, GitHub Copilot, VS Code, Copilot CLI, Cursor]
+authorization:
+  protocol: OAuth 2.1 (RFC 8414 + RFC 9728 discovery)
+  issuer: https://mcp.prismic.io/
+  authorization_endpoint: https://mcp.prismic.io/authorize
+  token_endpoint: https://mcp.prismic.io/token
+  revocation_endpoint: https://mcp.prismic.io/revoke
+  registration_endpoint: https://mcp.prismic.io/register
+  dynamic_client_registration: true
+  grant_types: [authorization_code, refresh_token]
+  code_challenge_methods: [S256]
+  token_endpoint_auth_methods: [client_secret_post, none]
+  scopes_advertised: false
+  scopes_note: >-
+    The authorization-server metadata declares no `scopes_supported`. Access is
+    bounded by the Prismic account's own repository permissions and role, not by
+    OAuth scopes, so there is no scope reference to capture.
+  identity_provider: prismic-auth.eu.auth0.com
+  well_known: well-known/prismic-well-known.yml
+introspection:
+  live_tools_list: gated
+  note: >-
+    POST tools/list to https://mcp.prismic.io/mcp returns HTTP 401
+    {"error":"Unauthorized"} anonymously, so the machine-readable inputSchema for
+    each tool requires an authenticated introspection. The tool names and
+    descriptions below are transcribed verbatim from Prismic's own MCP
+    documentation (https://prismic.io/docs/mcp, lastUpdated 2026-08-06); the
+    input schemas are NOT reproduced because they were not observable.
+tools:
+  # --- Discovery ---
+  - name: list_repositories
+    category: discovery
+    description: List all Prismic repositories you have access to. Called first to
+      discover available repositories.
+  - name: list_custom_types
+    category: discovery
+    description: List all custom types (content models) in a repository with their
+      id, label, and format.
+  - name: list_shared_slices
+    category: discovery
+    description: List all shared slices in a repository with their variation names.
+  - name: list_locales
+    category: discovery
+    description: List all locales configured in a repository.
+  - name: list_releases
+    category: discovery
+    description: List all releases in a repository, newest first.
+  - name: list_document_versions
+    category: discovery
+    description: List every version of a document, including drafts, published, archived,
+      and release versions.
+  # --- Read ---
+  - name: search_documents
+    category: read
+    description: Search documents by keywords with optional filters for custom type,
+      locale, status, and tags. Returns metadata, not full content.
+  - name: search_assets
+    category: read
+    description: Search the asset library by keyword. A single query matches against
+      filename, alt text, notes, and credits. Returns previews.
+  - name: get_document
+    category: read
+    description: Fetch a document's metadata and full content. Supports reading from
+      a specific version or release.
+  - name: get_custom_type
+    category: read
+    description: Fetch a custom type's full field model and an empty content template
+      for creating documents.
+  - name: get_shared_slice
+    category: read
+    description: Fetch a shared slice's full model with all variations and ready-to-use
+      empty variation bodies.
+  # --- Write ---
+  - name: create_release
+    category: write
+    description: Create a new empty release. Returns its id for use with create_document
+      and update_document.
+  - name: create_document
+    category: write
+    description: Create a new document inside a release. Missing fields are filled
+      with model defaults.
+  - name: update_document
+    category: write
+    description: Update a document into a release with full content. The new version
+      is branched from a base version.
+  - name: upload_asset
+    category: write
+    description: Fetch an asset from a URL and upload it to the repository's asset
+      library. Returns the Prismic CDN url for use in documents.
+  - name: publish_release
+    category: write
+    description: Publish a pending release, making all of its documents live. Requires
+      a Publisher (Manager) role. Irreversible.
+    consequence: irreversible
+write_safety:
+  staged_by_default: true
+  note: >-
+    Prismic documents that every write tool saves into a release rather than to
+    live content, and recommends reviewing and publishing from the dashboard.
+    `publish_release` is the only irreversible operation and requires an explicit
+    user instruction plus a Publisher (Manager) role. Migration releases cannot be
+    published via MCP.
+counts:
+  tools: 16
+  discovery: 6
+  read: 5
+  write: 5

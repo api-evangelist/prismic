@@ -1,0 +1,111 @@
+generated: '2026-08-13'
+method: searched
+source: https://prismic.io/docs/graphql-technical-reference
+note: >-
+  Prismic is not a payments or transactional API, so there are no test cards, no
+  test-mode key prefixes and no test clocks — and none are invented here. What
+  Prismic does publish is the other shape of this artifact: hosted API consoles
+  you can query against real content, a local simulator, and a real environment
+  separation model. Recorded as published; no test credentials exist to capture
+  because Prismic publishes none.
+test_live_separation:
+  key_prefixes: none
+  mode_flag: none
+  note: >-
+    There is no test-vs-live credential split. Prismic separates by ENVIRONMENT
+    (a separate repository) and by RELEASE (staged content inside one
+    repository), not by key mode. A write token is a write token — the same token
+    shape reaches production content.
+  implication: >-
+    An agent holding a Prismic write token has no dry-run mode. The safety
+    boundary is that writes land in a release and nothing is live until the
+    release is published.
+consoles:
+  - name: GraphQL Explorer
+    kind: hosted playground
+    url: https://{repo}.prismic.io/graphql
+    auth: repository session
+    docs: https://prismic.io/docs/graphql-technical-reference
+    features: [split query/result panes, schema autocompletion (ctrl+space), live schema
+        introspection]
+    note: >-
+      Every repository gets its own explorer, because every repository has its own
+      dynamically generated schema.
+  - name: API Explorer
+    kind: hosted query builder
+    location: Prismic dashboard
+    shipped: '2025-06-06'
+    docs: https://prismic.io/updates/api-explorer
+    features: [Content API query construction, all query types (since 2025-06-16),
+      orderings (since 2025-06-23)]
+  - name: Slice Simulator
+    kind: local component sandbox
+    docs: https://prismic.io/docs/slice-machine
+    role: Renders one slice in isolation against mock content on the developer's own
+      dev server.
+    note: Available directly from the framework integrations since 2026-01-15.
+  - name: Postman collection
+    kind: published collection
+    url: https://documenter.getpostman.com/view/5743666/TzCHBqbH
+    probed: '2026-08-13'
+    http_status: 200
+    covers: Types API
+    source: https://prismic.io/docs/custom-types-api
+    note: >-
+      Prismic links this from its Types API reference as the recommended way to
+      try the API. It is the only Prismic API with a published collection.
+anonymous_access:
+  available: true
+  mechanism: '"Open API" repository visibility'
+  note: >-
+    A repository set to Open API answers the Content, Repository, Tags and
+    GraphQL APIs with no credential at all. This is the closest thing Prismic has
+    to a public sandbox and it is how the specs in this repo were verified —
+    Prismic's own marketing site repository (prismic-main) is publicly readable.
+  verified_examples:
+    - {url: 'https://prismic-main.cdn.prismic.io/api/v2', http_status: 200, note: Repository
+        API}
+    - {url: 'https://prismic-main.cdn.prismic.io/api/v2/documents/search', http_status: 200,
+       note: Content API}
+    - {url: 'https://prismic-main.cdn.prismic.io/api/tags', http_status: 200, note: Tags
+        API}
+    - {url: 'https://prismic-main.cdn.prismic.io/graphql', http_status: 200, note: 'GraphQL
+        API — anonymous introspection succeeded'}
+  caveat: >-
+    prismic-main is Prismic's OWN production repository, not a sandbox Prismic
+    offers for experimentation. It is read-only to the public and its content
+    changes with their marketing site. Prismic publishes no dedicated demo
+    repository.
+environments:
+  feature: Environments
+  docs: https://prismic.io/docs/environments
+  role: 'Safely iterate on content models without affecting production content — a
+    separate repository acting as staging.'
+  availability:
+    free_tiers: not included
+    platinum: '1 development environment, $3,000/year add-on on yearly invoiced plans'
+    enterprise: 2 development environments, plus custom
+  note: >-
+    The genuine test environment is a paid add-on. On every self-serve tier below
+    Platinum, the only place to try a content-model change is production.
+free_tier:
+  available: true
+  price: $0
+  quotas: {users: 1, locales: 2, api_calls_month: 4000000, cdn_bandwidth_month: 100
+      GB}
+  includes: [Migration API, GraphQL, webhooks, previews, releases, Slice Machine]
+  signup: https://prismic.io/dashboard/signup
+  note: The practical way to get a working credential without talking to sales. See
+    plans/prismic-plans-pricing.yml.
+fixtures:
+  test_values: none published
+  mock_content: >-
+    Slice Machine generates mock content per slice variation for the Slice
+    Simulator, but the values are generated locally, not published by Prismic as
+    fixed fixtures.
+gaps:
+  - No dedicated public demo/sandbox repository.
+  - No test-mode credentials or key prefixes.
+  - No published fixture or trigger tooling for webhooks beyond the `test-trigger`
+    payload type.
+  - Environment separation is paywalled above the self-serve tiers.

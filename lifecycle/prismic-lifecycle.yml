@@ -1,0 +1,104 @@
+generated: '2026-08-13'
+method: searched
+source: https://prismic.io/docs/apis.md
+versioning:
+  scheme: uri-path
+  current: v2
+  evidence: 'https://{repo}.cdn.prismic.io/api/v2 — the Content and Repository APIs
+    carry the version in the path.'
+  unversioned_apis:
+    - {name: Tags API, base: 'https://{repo}.cdn.prismic.io/api/tags', note: 'no version
+        segment; still labelled beta'}
+    - {name: Types API, base: 'https://customtypes.prismic.io', note: no version segment}
+    - {name: Asset API, base: 'https://asset-api.prismic.io', note: no version segment}
+    - {name: Migration API, base: 'https://migration.prismic.io', note: 'no version
+        segment; GA since 2025-08-04'}
+    - {name: GraphQL API, base: 'https://{repo}.cdn.prismic.io/graphql', note: 'schema
+        is per-repository and dynamic; no version segment'}
+  package_versioning:
+    scheme: semver, with major versions carried into the documentation URL
+    evidence: https://prismic.io/docs/technical-reference/prismicio-client/v7
+    migration_guides:
+      - https://prismic.io/docs/prismicio-client-v7-migration-guide
+  content_versioning:
+    scheme: ref
+    note: >-
+      Prismic's most distinctive lifecycle mechanic is at the CONTENT layer, not
+      the API layer. Every Content API query must carry a `ref` naming a specific
+      version of the repository's content, obtained from the Repository API. A new
+      master ref is minted on every publish. Old refs are honoured for a while so
+      an in-flight request stays consistent, then purged — Prismic's own wording:
+      "old refs will get purged eventually." No sunset window is published for a
+      ref, so a long-lived cached query URL will eventually 4xx.
+deprecation:
+  policy_url: null
+  sunset_header: unknown
+  policy_note: >-
+    Prismic publishes no API deprecation policy, no sunset window, and no
+    RFC 8594 Sunset/Deprecation header documentation. What it does publish is a
+    labelled list of DEPRECATED PACKAGES with named replacements, plus in-place
+    "deprecated" markers on individual API response fields. That is a deprecation
+    PRACTICE, not a deprecation POLICY, so no `Deprecation` pointer is wired in
+    apis.yml.
+  deprecated_packages_url: https://prismic.io/docs/apis.md
+  deprecated_packages:
+    - {name: '@prismicio/richtext', last_version: 2.1.5, last_published: '2023-05-22'}
+    - {name: '@prismicio/helpers', last_version: 2.3.9, last_published: '2023-01-28',
+       replacement: '@prismicio/client'}
+    - {name: '@prismicio/types', last_version: 0.2.9, last_published: '2024-05-24',
+       replacement: '@prismicio/client'}
+  deprecated_response_fields:
+    - {api: Repository API, field: bookmarks, source: https://prismic.io/docs/repository-api-technical-reference,
+       note: 'refers to a feature Prismic no longer supports'}
+    - {api: Repository API, field: experiments, source: https://prismic.io/docs/repository-api-technical-reference}
+    - {api: Repository API, field: tags, source: https://prismic.io/docs/repository-api-technical-reference,
+       note: 'always empty; tags moved into form fields'}
+    - {api: Webhook payload, field: bookmarks, source: https://prismic.io/docs/webhooks,
+       note: 'labelled "Legacy field. Do not use."'}
+    - {api: Webhook payload, field: collection, source: https://prismic.io/docs/webhooks,
+       note: 'labelled "Legacy field. Do not use."'}
+  observed_live: >-
+    A live GET of https://prismic-main.cdn.prismic.io/api/v2 on 2026-08-13 still
+    returns `bookmarks: {}`, `experiments: {draft: [], running: []}` and
+    `tags: []` — the deprecated fields are documented as dead but are still
+    served, so consumers are not broken by their removal.
+beta_surfaces:
+  - {name: Tags API, status: beta, gate: 'activation on request via the community
+      forum', source: https://prismic.io/docs/tags-api-technical-reference}
+  - {name: Shared slices (Types API /slices routes), status: 'Slice Machine repositories
+      only', gate: activation on request, source: https://prismic.io/docs/custom-types-api}
+status_page:
+  url: https://status.prismic.io/
+  provider: Statuspage (Atlassian)
+  api: https://status.prismic.io/api/v2/summary.json
+  rss: https://status.prismic.io/history.rss
+  probed: '2026-08-13'
+  http_status: 200
+  components:
+    - Website
+    - Migration API
+    - Webhooks
+    - Dashboard
+    - Authentication
+    - Slice Machine
+    - Bandwidth Data
+    - Editor
+    - Content API
+  component_gap: >-
+    Nine components are tracked, but the Types API, Asset API, GraphQL API, Tags
+    API and the MCP server have no component of their own. A GraphQL or Types API
+    incident is not independently observable from the status page.
+sla:
+  url: null
+  note: >-
+    No public SLA document is published (https://prismic.io/legal/sla returns
+    404). An SLA is a plan-gated commitment: the pricing data marks `sla` as
+    included only on Enterprise ("Support and uptime SLAs"), null on every
+    self-serve tier. See plans/prismic-plans-pricing.yml.
+  enterprise_only: true
+support_lifecycle:
+  frameworks_supported: [Next.js, Nuxt, SvelteKit]
+  note: >-
+    Framework support is announced as changelog entries (e.g. "Nuxt 4 support",
+    2025-07-16) rather than governed by a published support matrix with end dates.
+changelog: changelog/prismic-changelog.yml

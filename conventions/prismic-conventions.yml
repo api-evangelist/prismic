@@ -1,0 +1,156 @@
+generated: '2026-08-13'
+method: searched
+source: https://prismic.io/docs/content-api
+docs:
+  - https://prismic.io/docs/content-api
+  - https://prismic.io/docs/repository-api-technical-reference
+  - https://prismic.io/docs/custom-types-api
+  - https://prismic.io/docs/asset-api-technical-reference
+  - https://prismic.io/docs/migration-api-technical-reference
+  - https://prismic.io/docs/graphql-technical-reference
+note: >-
+  Prismic does not run one API with one set of conventions — it runs seven HTTP
+  surfaces on four different hosts with materially different semantics. The
+  read surfaces are CDN-cached, unversioned-by-header and ref-addressed; the
+  write surfaces are gateway-fronted, one-request-per-second, and identify the
+  target repository with a header rather than a hostname. This document records
+  both, and where they disagree.
+authentication:
+  style: split read/write — see authentication/prismic-authentication.yml
+  read: 'access_token query parameter (Content/Repository), Authorization: Bearer
+    (GraphQL); optional on public repositories'
+  write: 'Authorization: Bearer <write token> + `repository: <repo-id>` header, always
+    required'
+  agent: OAuth 2.1 with dynamic client registration (MCP server only)
+ref_addressing:
+  applies_to: [Content API, GraphQL API]
+  required: true
+  mechanism: >-
+    Every read is addressed to a specific version of the repository's content.
+    The caller first GETs the Repository API root (/api/v2) to obtain the current
+    master `ref`, then passes it as `?ref=` (Content API) or as a `Prismic-Ref`
+    header (GraphQL). This is Prismic's single most distinctive convention and
+    the one an agent is most likely to get wrong: without a ref the query fails,
+    and with a stale ref it eventually fails as old refs are purged.
+  release_reads: 'Passing a release ref instead of the master ref reads that release''s
+    staged content — the same mechanism serves previews, scheduled releases and drafts.'
+  observed: 'Live: master ref an3eUxEAACcAexk- returned by
+    https://prismic-main.cdn.prismic.io/api/v2 on 2026-08-13.'
+pagination:
+  content_api:
+    style: page-number
+    params: [page, pageSize]
+    defaults: {page: 1, pageSize: 20}
+    maximum_page_size: 100
+    response_fields: [page, results_per_page, results_size, total_results_size, total_pages,
+      next_page, prev_page, results]
+    cursor_option:
+      param: after
+      description: Returns documents after the one whose id is given — a cursor-style
+        escape hatch layered on the page-number model.
+  graphql_api:
+    style: relay-cursor
+    args: [first, last, before, after]
+    response_fields: [pageInfo.hasNextPage, pageInfo.hasPreviousPage, pageInfo.startCursor,
+      pageInfo.endCursor, edges, totalCount]
+    maximum_page_size: 100
+  asset_api:
+    style: cursor
+    params: [limit, cursor]
+    cursor_semantics: ID of the asset after which to start the query.
+  divergence: >-
+    Three read surfaces, three different pagination models. An agent that learns
+    `page`/`pageSize` from the Content API cannot carry it to GraphQL or the Asset
+    API.
+filtering_and_selection:
+  content_api:
+    param: q
+    syntax: bracketed predicate list, URL-encoded — e.g. q=[[at(document.type,"post")]]
+    filter_families: [at, not, any, in, fulltext, similar, date/time (16 filters),
+      number, geopoint]
+    ordering: 'orderings=[my.post.date desc] — multi-field, comma-separated'
+    language: 'lang=en-us, or lang=* for all locales'
+    link_expansion:
+      param: fetchLinks
+      description: Pulls named fields from linked documents into the response — Prismic's
+        equivalent of field expansion.
+    field_selection:
+      param: fetch
+      description: Restricts which fields are returned.
+    url_resolution:
+      param: routes
+      description: A route resolver that populates each document's `url` property.
+        Without it, `url` is null.
+  graphql_api:
+    description: Selective and deep fetching is the point of the GraphQL surface —
+      choose fields and traverse content relationships in one round trip.
+    filters: per-type `Where*` input objects, generated dynamically per repository
+    sorting: per-type `Sort*` enums; `SortDocumentsBy` on `_allDocuments`
+metadata:
+  document_envelope: [id, uid, url, type, href, tags, first_publication_date, last_publication_date,
+    slugs, lang, alternate_languages, data]
+  graphql_equivalent: _meta {id, uid, type, tags, lang, alternateLanguages, firstPublicationDate,
+    lastPublicationDate}
+  id_shape: 16-character opaque alphanumeric string (e.g. ZMI65RQAADkECUFM). Not a
+    prefixed id — the type is carried in a separate `type` field, not in the identifier.
+idempotency:
+  supported: false
+  header: null
+  note: >-
+    Prismic documents no idempotency key on any write surface. The Migration API's
+    PUT /documents/{id} is naturally idempotent because it replaces the document
+    body, but POST /documents has no dedupe mechanism — a retried create makes a
+    second draft. Prismic's mitigation is directional rather than transactional:
+    every write lands in a release and nothing is live until the release is
+    published, so a duplicate is reviewable before it reaches production. No
+    `Idempotency` pointer is wired in apis.yml because there is no idempotency
+    contract to point at.
+request_tracing:
+  request_id_header: null
+  observed: >-
+    The Kong gateway in front of migration.prismic.io returns a `request_id` in
+    its error body (e.g. {"message":"no Route matched with those values",
+    "request_id":"6410f254..."}), but this is gateway behaviour on unrouted paths,
+    not a documented per-request trace id. No tracing header is documented on any
+    API.
+versioning:
+  api: uri-path (v2) on the Content and Repository APIs; no version segment on Tags,
+    Types, Asset, Migration or GraphQL
+  header_negotiation: none
+  detail: lifecycle/prismic-lifecycle.yml
+error_envelope:
+  shape: inconsistent across surfaces
+  rfc9457: false
+  detail: errors/prismic-error-codes.yml
+rate_limit_signaling:
+  headers_documented: none
+  note: >-
+    Prismic publishes rate limits as numbers in prose but documents no
+    X-RateLimit-*/RateLimit-* response headers and no Retry-After. An agent has no
+    runtime signal — it learns the limit only by receiving a 429.
+  detail: rate-limits/prismic-rate-limits.yml
+caching:
+  cdn: true
+  host_convention: >-
+    The `.cdn.prismic.io` host is cached at the edge; the bare `.prismic.io` host
+    is not. Cached reads are exempt from the rate limit AND from the plan's
+    monthly API-call quota, which makes host choice a billing decision as much as
+    a performance one. `@prismicio/client` v5+ uses the CDN host by default.
+  invalidation: A publish mints a new master ref, which changes the query URL and
+    therefore the cache key.
+url_limits:
+  max_url_length: 2048
+  applies_to: Content API
+  consequence: >-
+    Because filters, orderings, routes and fetchLinks are all URL-encoded query
+    parameters, a complex query can exceed the limit. This is the practical
+    ceiling on Content API query complexity, and the reason GraphQL exists
+    alongside it.
+webhooks:
+  detail: asyncapi/prismic-webhooks.yml
+cross_references:
+  authentication: authentication/prismic-authentication.yml
+  errors: errors/prismic-error-codes.yml
+  lifecycle: lifecycle/prismic-lifecycle.yml
+  rate_limits: rate-limits/prismic-rate-limits.yml
+  data_model: data-model/prismic-data-model.yml

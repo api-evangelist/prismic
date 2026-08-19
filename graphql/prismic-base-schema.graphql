@@ -1,0 +1,171 @@
+# Prismic GraphQL API — built-in base schema (SDL)
+#
+# method: probed
+# source: https://prismic-main.cdn.prismic.io/graphql  (HTTP 200, GET + Prismic-Ref header)
+# probed: 2026-08-13
+#
+# HOW THIS WAS OBTAINED
+#   Prismic runs its own marketing site on a public Prismic repository
+#   ("prismic-main"), so its GraphQL endpoint answers anonymous introspection.
+#   A full GraphQL introspection query was executed against that live endpoint
+#   and returned 6,133 types.
+#
+# WHAT IS AND IS NOT HERE
+#   Prismic GraphQL schemas are PER-REPOSITORY and largely DYNAMIC: every custom
+#   type and shared slice defined in a repository generates its own object types,
+#   Where* input filters, Sort* enums and Query root fields at runtime. Of the
+#   6,133 introspected types, 6,118 were specific to Prismic's own content model
+#   and are NOT reproduced here — they describe prismic.io's website, not the API.
+#
+#   What follows is the STABLE, built-in base schema present in EVERY Prismic
+#   repository, transcribed verbatim from the live introspection result: the
+#   custom scalars, the _Document / _Linkable interfaces, the link object types,
+#   the Relay-style connection + pagination types, the _meta object, the
+#   document sort enum, and the one repository-independent Query root field
+#   (_allDocuments) with its full argument list.
+#
+# ENDPOINT
+#   https://<your-repo-name>.cdn.prismic.io/graphql   (read-only, GET requests)
+#   Requires a `Prismic-Ref` header carrying a ref from the Repository API
+#   (https://<your-repo-name>.cdn.prismic.io/api/v2). Private repositories also
+#   require an `Authorization: Bearer <access-token>` header.
+#
+# EXPLORER
+#   https://<your-repo-name>.prismic.io/graphql
+#
+# DOCS
+#   https://prismic.io/docs/graphql-technical-reference
+
+"""Date"""
+scalar Date
+
+"""DateTime"""
+scalar DateTime
+
+"""Raw JSON value"""
+scalar Json
+
+"""The `Long` scalar type represents non-fractional signed whole numeric values. Long can represent values between -(2^63) and 2^63 - 1."""
+scalar Long
+
+"""A prismic link"""
+interface _Linkable {
+  _linkType: String
+}
+
+"""A prismic document"""
+interface _Document {
+  _meta: Meta!
+}
+
+"""An external link"""
+type _ExternalLink implements _Linkable {
+  url: String!
+  target: String
+  _linkType: String
+}
+
+"""A linked file"""
+type _FileLink implements _Linkable {
+  name: String!
+  url: String!
+  size: Long!
+  _linkType: String
+}
+
+"""A linked image"""
+type _ImageLink implements _Linkable {
+  name: String!
+  url: String!
+  size: Long!
+  height: Int!
+  width: Int!
+  _linkType: String
+}
+
+type Meta {
+  """The id of the document."""
+  id: String!
+  """The uid of the document."""
+  uid: String
+  """The type of the document."""
+  type: String!
+  """The tags of the document."""
+  tags: [String!]!
+  """The language of the document."""
+  lang: String!
+  """Alternate languages the document."""
+  alternateLanguages: [RelatedDocument!]!
+  """The first publication date of the document."""
+  firstPublicationDate: DateTime
+  """The last publication date of the document."""
+  lastPublicationDate: DateTime
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+"""An edge in a connection."""
+type _DocumentEdge {
+  """The item at the end of the edge."""
+  node: _Document!
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""A connection to a list of items."""
+type _DocumentConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """A list of edges."""
+  edges: [_DocumentEdge]
+  totalCount: Long!
+}
+
+enum SortDocumentsBy {
+  meta_firstPublicationDate_ASC
+  meta_firstPublicationDate_DESC
+  meta_lastPublicationDate_ASC
+  meta_lastPublicationDate_DESC
+}
+
+"""
+The query root. Every repository ALSO generates, at runtime, a `<type_id>` field
+and an `all<Type_id>s` field for each custom type defined in that repository
+(e.g. `blog_post` and `allBlog_posts`). Those fields are repository-specific and
+are therefore not part of this base schema. `_allDocuments` is the one root
+field present in every repository.
+"""
+type Query {
+  _allDocuments(
+    sortBy: SortDocumentsBy,
+    type: String,
+    type_in: [String!],
+    id: String,
+    id_in: [String!],
+    lang: String,
+    tags: [String!],
+    tags_in: [String!],
+    firstPublicationDate: DateTime,
+    firstPublicationDate_after: DateTime,
+    firstPublicationDate_before: DateTime,
+    lastPublicationDate: DateTime,
+    lastPublicationDate_after: DateTime,
+    lastPublicationDate_before: DateTime,
+    fulltext: String,
+    similar: similar,
+    before: String,
+    after: String,
+    first: Int,
+    last: Int
+  ): _DocumentConnection!
+}

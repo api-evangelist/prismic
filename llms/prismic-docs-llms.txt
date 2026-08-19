@@ -1,0 +1,77 @@
+# Prismic Docs
+
+> Learn how to build websites with Prismic, the headless page builder.
+
+Prismic supports websites built with Next.js, Nuxt, and SvelteKit. Prismic provides SDKs for React, Vue, and Svelte.
+
+## Helpful links
+
+- [API References](https://prismic.io/docs/apis.md): A complete list of Prismic's packages and APIs.
+- [Prismic Glossary](https://prismic.io/docs/glossary.md): Definitions of key terms in Prismic.
+- [Help Center](https://prismic.io/docs/help-center.md): Find the help you need to make your Prismic project a success.
+
+## Get started documentation
+
+- [What is Prismic?](https://prismic.io/docs/overview.md): Learn about Prismic and its basic concepts.
+- [Set up an Account](https://prismic.io/docs/account-setup.md): Create your Prismic account and get oriented with the dashboard.
+- [Work with a Developer](https://prismic.io/docs/work-with-a-developer.md): Learn how to collaborate effectively with a website developer.
+- [Begin Creating](https://prismic.io/docs/begin-creating.md): Create, preview, and publish your first page in Prismic.
+
+## Use Prismic documentation
+
+- [Create pages](https://prismic.io/docs/create-pages.md): Learn how to create and edit pages using Prismic's Page Builder.
+- [Organize pages](https://prismic.io/docs/organize-pages.md): Learn to find, search, and organize your Prismic content using the dashboard, spaces, and tags.
+- [Archive pages](https://prismic.io/docs/archive-pages.md): Learn how to archive, unarchive, and delete pages in Prismic.
+- [Schedule releases](https://prismic.io/docs/releases.md): Use releases to publish multiple page changes at once.
+- [Page fields](https://prismic.io/docs/page-fields.md): Learn about fields and how to use them when creating pages.
+- [Media & Files](https://prismic.io/docs/media.md): Manage your media and files with the media library
+- [Localize pages](https://prismic.io/docs/localization.md): Learn how to write multilingual content and manage locales in the Page Builder.
+- [Integrations](https://prismic.io/docs/integrations.md): Third-party integrations to enhance your Prismic experience.
+
+## Manage Prismic documentation
+
+- [Repository Settings](https://prismic.io/docs/repository-settings.md): Manage general repository options, user access, and development configurations.
+- [Users & Permissions](https://prismic.io/docs/users.md): Manage team members, permissions, custom roles, and Single Sign-On (SSO).
+- [Your Account](https://prismic.io/docs/account.md): Manage your personal Prismic account.
+- [Billing](https://prismic.io/docs/billing.md): How to manage repository plans, payments, billing details, and invoices.
+
+## Framework documentation
+
+- [Use Next.js with Prismic](https://prismic.io/docs/nextjs.md): Learn how to build websites with Next.js and Prismic.
+- [Use Nuxt with Prismic](https://prismic.io/docs/nuxt.md): Learn how to build websites with Nuxt and Prismic.
+- [Use SvelteKit with Prismic](https://prismic.io/docs/sveltekit.md): Learn how to build websites with SvelteKit and Prismic.
+
+## Concepts documentation
+
+- [Content Modeling](https://prismic.io/docs/content-modeling.md): This article explains what content modeling is.
+- [Fetch Content](https://prismic.io/docs/fetch-content.md): Read content from your Prismic repository.
+- [Slices](https://prismic.io/docs/slices.md): Learn what slices are and how you can use them to build pages.
+- [Slice Machine](https://prismic.io/docs/slice-machine.md): Prismic's local development tool for content modeling.
+- [Routes](https://prismic.io/docs/routes.md): Configure URLs for your Prismic pages using route resolvers.
+- [Locales](https://prismic.io/docs/locales.md): Use locales for multilingual and regional content.
+- [Previews](https://prismic.io/docs/previews.md): View and share draft content on your website before publishing.
+- [Webhooks](https://prismic.io/docs/webhooks.md): Learn how to trigger workflows with webhooks in Prismic.
+- [Environments](https://prismic.io/docs/environments.md): Safely iterate on content models without affecting production content.
+- [Migrate to Prismic](https://prismic.io/docs/migration.md): Learn how to migrate your existing content to Prismic.
+- [Prismic with AI](https://prismic.io/docs/ai.md): Learn how to use Prismic's AI features in your development workflow.
+
+## Fields documentation
+
+- [Boolean](https://prismic.io/docs/fields/boolean.md): This article explains what the boolean field is and how to configure it.
+- [Color](https://prismic.io/docs/fields/color.md): This article explains what the color field is and how to configure it.
+- [Content Relationship](https://prismic.io/docs/fields/content-relationship.md): This article explains what the content relationship field is and how to configure it.
+- [Date](https://prismic.io/docs/fields/date.md): This article explains what the date field is and how to configure it.
+- [Embed](https://prismic.io/docs/fields/embed.md): This article explains what the embed field is and how to configure it.
+- [Geopoint](https://prismic.io/docs/fields/geopoint.md): This article explains what the geopoint field is and how to configure it.
+- [Image](https://prismic.io/docs/fields/image.md): This article explains what the image field is and how to configure it.
+- [Integration](https://prismic.io/docs/fields/integration.md): This article explains what the integration field is and how to configure it.
+- [Link to Media](https://prismic.io/docs/fields/link-to-media.md): This article explains what the link to media field is and how to configure it.
+- [Link](https://prismic.io/docs/fields/link.md): This article explains what the link field is and how to configure it.
+- [Number](https://prismic.io/docs/fields/number.md): This article explains what the number field is and how to configure it.
+- [Repeatable group](https://prismic.io/docs/fields/repeatable-group.md): This article explains what the repeatable group is and how to configure it.
+- [Rich Text](https://prismic.io/docs/fields/rich-text.md): This article explains what the rich text field is and how to configure it.
+- [Select](https://prismic.io/docs/fields/select.md): This article explains what the select field is and how to configure it.
+- [Table](https://prismic.io/docs/fields/table.md): This article explains what the table field is and how to configure it.
+- [Text](https://prismic.io/docs/fields/text.md): This article explains what the text field is and how to configure it.
+- [Timestamp](https://prismic.io/docs/fields/timestamp.md): This article explains what the timestamp field is and how to configure it.
+- [UID](https://prismic.io/docs/fields/uid.md): This article explains what the UID field is and how to configure it.

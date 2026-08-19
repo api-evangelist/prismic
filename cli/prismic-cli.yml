@@ -1,0 +1,106 @@
+generated: '2026-08-13'
+method: searched
+source: https://prismic.io/docs/cli
+name: Prismic CLI
+package: prismic
+registry: npm
+package_url: https://www.npmjs.com/package/prismic
+version: 1.14.0
+published: '2026-07-31'
+launched: '2026-06-08'
+launch_note: https://prismic.io/updates/cli
+install:
+  - method: npx
+    command: npx prismic
+    note: No installation required — this is the documented default invocation.
+  - method: npm
+    command: npm install -g prismic
+help:
+  root: npx prismic --help
+  subcommand: npx prismic <command> --help
+  example: npx prismic webhook create --help
+agent_integration:
+  skill: npx skills add --global --yes prismicio/skills
+  artifact: skills/_index.yml
+  note: >-
+    Prismic ships an Agent Skill whose entire purpose is teaching an agent to
+    drive this CLI. The CLI is Prismic's primary agent-facing control plane for
+    repository configuration and content modelling; the MCP server covers content.
+commands:
+  - command: prismic docs
+    group: documentation
+    description: List and view Prismic documentation.
+    subcommands:
+      - {command: 'prismic docs list', description: Discover available documentation
+          pages.}
+      - {command: 'prismic docs view <path>', description: Read a documentation page
+          in the terminal.}
+  - command: prismic repo
+    group: repository
+    description: Create and manage repositories.
+  - command: prismic locale
+    group: repository
+    description: Manage repository locales.
+  - command: prismic preview
+    group: repository
+    description: Manage repository previews.
+  - command: prismic token
+    group: auth
+    description: Manage repository access and write tokens.
+    subcommands:
+      - {command: 'prismic token create --write', description: 'Create a bearer write
+          token for the Types, Asset and Migration APIs.'}
+  - command: prismic webhook
+    group: events
+    description: Manage repository webhooks.
+    subcommands:
+      - {command: 'prismic webhook create <url> [--trigger <event>]', description: Create
+          a webhook, optionally scoped to specific events. All events trigger it by
+          default.}
+  - command: prismic login
+    group: auth
+    description: Authenticate the CLI with a Prismic account.
+  - command: prismic logout
+    group: auth
+    description: Log out of the CLI.
+  - command: prismic whoami
+    group: auth
+    description: Determine which Prismic account is logged in.
+type_builder_commands:
+  note: >-
+    These commands are available only in repositories that support the Type
+    Builder (https://prismic.io/docs/type-builder), Prismic's cloud content-model
+    editor.
+  commands:
+    - {command: 'prismic init [--repo <name>]', description: 'Install and set up
+        Prismic in a new website project — installs packages, configures a client
+        and content previews.'}
+    - {command: 'prismic pull', description: 'Pull content models from Prismic into
+        the project. Prismic is the source of truth; local files are created, updated
+        or deleted to match. Also generates TypeScript types and bootstraps page/slice
+        component files.'}
+    - {command: 'prismic push', description: 'Push local content models to Prismic.
+        Local files are the source of truth; Prismic models are created, updated or
+        deleted to match.'}
+    - {command: 'prismic gen', description: Generate code for a project.}
+key_flows:
+  - name: Bootstrap a Prismic project
+    steps: ['npx prismic init --repo <your-repository-name>']
+  - name: Round-trip content models
+    steps: ['npx prismic pull', '# edit models locally or in Slice Machine', 'npx prismic
+        push']
+  - name: Wire a host rebuild on publish
+    steps:
+      - 'npx prismic webhook create <build-hook-url> --trigger documentsPublished --trigger
+        documentsUnpublished'
+    docs: https://prismic.io/docs/webhooks
+  - name: Mint a write token for the HTTP APIs
+    steps: ['npx prismic login', 'npx prismic token create --write']
+    note: Prints the bearer token used by the Types, Asset and Migration APIs. Multiple
+      tokens can be created for different applications.
+superseded:
+  package: prismic-cli
+  last_version: 4.2.3
+  last_published: '2022-04-21'
+  note: The older `prismic-cli` bootstrap tool. The current CLI is the `prismic` npm
+    package.
