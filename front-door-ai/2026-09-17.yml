@@ -1,0 +1,34 @@
+# Front Door AI Index — prismic — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: prismic
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: prismic.io
+  final_host: prismic.io
+  ownership: own
+  owner: prismic
+  shares_host_with: null
+  inherited_from: null
+  verdict: scored
+  score: 56
+  host_score: 56
+  density: 32.0
+  words: 1750
+  tiers:
+    agentic: 22
+    core: 26
+    model: 8
+  ambiguous: 11
+  top_terms:
+    AI: 26
+    agent: 11
+    AI agent: 7
+    agentic: 7
+    MCP: 5
+    ChatGPT: 4
+    Claude: 4
+    AI assistant: 1
+    model context protocol: 1
+    prompts: 1
