@@ -1,0 +1,226 @@
+edges:
+- partner_name: Maven Central
+  partner: maven-central
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Java/JVM)
+  evidence: https://central.sonatype.com/artifact/io.prismic/android-kit
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: Maven Central (public registry JSON)
+    spec_file: null
+    language: Java/JVM
+    packages:
+    - name: io.prismic:android-kit
+      version: 1.2.0
+      released: '2015-10-27'
+      released_field: lastUpdated
+      lapsed: true
+      page: https://central.sonatype.com/artifact/io.prismic/android-kit
+      repo_leg: github-org:prismicio
+      publisher_leg: groupId:prismic.io
+      matched_by: domain
+    - name: io.prismic:java-kit
+      version: 2.0.0
+      released: '2018-01-22'
+      released_field: lastUpdated
+      lapsed: true
+      page: https://central.sonatype.com/artifact/io.prismic/java-kit
+      repo_leg: github-org:prismicio
+      publisher_leg: groupId:prismic.io
+      matched_by: domain
+    - name: io.prismic:scala-kit_2.12
+      version: 2.4.2
+      released: '2018-05-30'
+      released_field: lastUpdated
+      lapsed: true
+      page: https://central.sonatype.com/artifact/io.prismic/scala-kit_2.12
+      repo_leg: github-org:prismicio
+      publisher_leg: groupId:prismic.io
+      matched_by: domain
+    current: false
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: npm registry
+  partner: npm
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (JavaScript/TypeScript)
+  evidence: https://www.npmjs.com/package/@prismicio/client
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: npm registry (public registry JSON)
+    spec_file: null
+    language: JavaScript/TypeScript
+    packages:
+    - name: '@prismicio/client'
+      version: 7.22.3
+      released: '2026-10-16'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@prismicio/client
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    - name: '@prismicio/migrate'
+      version: 0.0.2
+      released: '2026-10-14'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@prismicio/migrate
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    - name: '@prismicio/next'
+      version: 2.3.4
+      released: '2026-10-16'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@prismicio/next
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    - name: '@prismicio/react'
+      version: 3.5.1
+      released: '2026-10-15'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@prismicio/react
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    - name: '@prismicio/richtext'
+      version: 2.1.5
+      released: '2026-07-02'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@prismicio/richtext
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    - name: '@prismicio/svelte'
+      version: 3.0.0
+      released: '2026-10-15'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@prismicio/svelte
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    - name: '@prismicio/types'
+      version: 0.2.9
+      released: '2026-07-02'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@prismicio/types
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    - name: '@prismicio/vue'
+      version: 6.1.5
+      released: '2026-10-16'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@prismicio/vue
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    - name: '@slicemachine/adapter-next'
+      version: 0.3.100
+      released: '2026-10-16'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@slicemachine/adapter-next
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    - name: '@slicemachine/adapter-nuxt'
+      version: 0.3.100
+      released: '2026-10-16'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@slicemachine/adapter-nuxt
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    - name: '@slicemachine/adapter-sveltekit'
+      version: 0.3.100
+      released: '2026-10-16'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@slicemachine/adapter-sveltekit
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    - name: prismic
+      version: 1.24.0
+      released: '2026-10-16'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/prismic
+      repo_leg: github-org:prismicio
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: PyPI
+  partner: pypi
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Python)
+  evidence: https://pypi.org/project/prismic/
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: PyPI (public registry JSON)
+    spec_file: null
+    language: Python
+    packages:
+    - name: prismic
+      version: 1.5.1
+      released: '2019-08-13'
+      released_field: upload_time
+      lapsed: true
+      page: https://pypi.org/project/prismic/
+      repo_leg: domain:prismic.io
+      publisher_leg: email:prismic.io
+      matched_by: domain
+    current: false
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+generated: '2026-10-18'
+method: searched
+source:
+- https://api.nuget.org/v3
+- https://crates.io/api/v1
+- https://proxy.golang.org
+- https://pypi.org/pypi
+- https://registry.npmjs.org
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
+checked:
+- https://api.nuget.org/v3
+- https://crates.io/api/v1
+- https://proxy.golang.org
+- https://pypi.org/pypi
+- https://registry.npmjs.org
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
