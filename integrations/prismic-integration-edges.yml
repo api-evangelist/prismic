@@ -346,6 +346,25 @@ edges:
   detected: '2026-10-20'
   detected_by: mirror-platform-listings.py
   category: IDE / developer extension marketplace listing
+- partner_name: Netlify (own)
+  partner: netlify
+  partner_match: mirror
+  mirror_match: domain
+  type: marketplace
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  marketplace: own
+  evidence: https://www.netlify.com/integrations/prismic/
+  mirror_of: netlify/integrations/netlify-integration-edges.yml
+  apps:
+  - Prismic
+  - Prismic Setup Guide
+  listing_count: 1
+  detected: '2026-10-22'
+  detected_by: mirror-platform-listings.py
+  category: CMS
+  partner_tier: listing
 generated: '2026-10-18'
 method: searched
 source:
@@ -378,3 +397,4 @@ checked:
 - https://skillsmp.com/sitemap.xml
 - https://www.skills.sh/sitemap.xml
 - jetbrains/integrations/jetbrains-integration-edges.yml
+- netlify/integrations/netlify-integration-edges.yml
