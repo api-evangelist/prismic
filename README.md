@@ -64,35 +64,149 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Prismic is a headless CMS and page builder that empowers marketing teams to
-create and manage website content independently while developers work in their
-preferred tech stack. It provides a GraphQL API and REST Content API for
-fetching structured content from Prismic repositories, enabling fast, CDN-backed
-delivery for modern web applications.
+Prismic is a headless CMS and page builder that lets marketing teams create and
+manage website content independently while developers work in their preferred
+stack. Content is modelled as custom types and reusable "slices", authored in a
+visual Page Builder or locally in Slice Machine, and delivered over a CDN-backed
+API. Prismic runs seven public HTTP APIs across four hosts: a Content API and
+Repository API for reads, a beta Tags API, a Types API for content models, an
+Asset API for the media library, a Migration API for bulk content creation, and
+a read-only GraphQL endpoint whose schema is generated per repository from the
+customer's own content model. Every read is addressed to a content "ref" naming
+a specific published version. Prismic also ships a first-party CLI, a published
+Agent Skill, and a remote OAuth-protected MCP server with sixteen tools, and
+supports Next.js, Nuxt and SvelteKit with first-party rendering components.
 
-## Links
+**Areas:** GraphQL · Headless CMS · Content Management · Page Builder · JAMstack · Marketing · Content Delivery · Developer Tools · MCP · Webhook · Localization · Digital Asset Management
 
-- **Website**: https://prismic.io
-- **Documentation**: https://prismic.io/docs/graphql-technical-reference
-- **Pricing**: https://prismic.io/pricing
-- **GitHub Organization**: https://github.com/prismicio
-- **LinkedIn**: https://www.linkedin.com/company/prismic-io
+## Prismic on APIs.io
 
-## GraphQL API
+Everything profiled for Prismic is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/prismic/](https://apis.io/providers/prismic/)** — or go straight to one of the APIs or properties below.
 
-The Prismic GraphQL API endpoint follows the pattern:
+### APIs (8)
 
-```
-https://{your-repo-name}.cdn.prismic.io/graphql
-```
+- [Prismic Content API](https://apis.io/apis/prismic/content-api/) — The Content API is Prismic's primary read surface. It queries published documents from a repository with a bracketed filter language (`q`), orderings,…
+- [Prismic Repository API](https://apis.io/apis/prismic/repository-api/) — The Repository API is the gateway to a Prismic repository. A single unauthenticated GET returns the repository's available refs (including the master ref…
+- [Prismic GraphQL API](https://apis.io/apis/prismic/graphql-api/) — A read-only GraphQL endpoint for deep and selective fetching of content from a Prismic repository. The schema is generated per repository: every custom type…
+- [Prismic Types API](https://apis.io/apis/prismic/types-api/) — The Types API reads and writes a repository's content models — custom types and Slice Machine shared slices — as JSON. It is how content models are backed…
+- [Prismic Asset API](https://apis.io/apis/prismic/asset-api/) — The Asset API manages a repository's media library: list and search assets by keyword, upload a new asset as multipart form data, patch its alt text, notes…
+- [Prismic Migration API](https://apis.io/apis/prismic/migration-api/) — The Migration API creates and updates Prismic pages programmatically, using the same document shape the Content API returns. Everything it writes lands in a…
+- [Prismic Tags API](https://apis.io/apis/prismic/tags-api/) — A single-endpoint beta API that returns every tag used across a repository's pages, including tags on drafts and pages staged in releases, as a flat array.…
+- [Prismic MCP Server](https://apis.io/apis/prismic/mcp/) — A remote, OAuth-protected Model Context Protocol server that lets an AI assistant search, read, create and publish Prismic content in conversation. Sixteen…
 
-Every Prismic repository includes an integrated GraphQL explorer at
-`https://{your-repo-name}.prismic.io/graphql` for discovering schema types
-and testing queries.
+### Published properties
 
-## Contents
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-- [`apis.yml`](apis.yml) — APIs.json 0.19 catalog entry
-- [`plans/prismic-plans.md`](plans/prismic-plans.md) — Subscription plan details
-- [`rate-limits/prismic-rate-limits.md`](rate-limits/prismic-rate-limits.md) — API rate limit documentation
-- [`finops/prismic-finops.md`](finops/prismic-finops.md) — Cost optimization guidance
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Prismic Webhooks](https://apis.io/asyncapis/prismic/prismic-webhooks/)
+
+#### GraphQL (1)
+
+GraphQL schemas.
+
+- [Prismic GraphQL API](https://apis.io/graphqls/prismic/prismic-graphql/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [Prismic MCP Server](https://apis.io/servers/prismic/prismic-mcp-server/)
+
+#### Security (4)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Prismic Authentication](https://apis.io/security/prismic/prismic-authentication/)
+- [Prismic Domain Security](https://apis.io/security/prismic/prismic-domain-security/)
+- [Prismic Trust Center](https://apis.io/security/prismic/prismic-trust-center/)
+- [Prismic Vulnerability Disclosure](https://apis.io/security/prismic/prismic-vulnerability-disclosure/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Prismic Plans Pricing](https://apis.io/plans/prismic/prismic-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Prismic Rate Limits](https://apis.io/rate-limits/prismic/prismic-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://prismic.io)
+- [Documentation](https://prismic.io/docs)
+- [Getting started](https://prismic.io/docs/nextjs)
+- [API reference](https://prismic.io/docs/apis)
+- [Pricing](https://prismic.io/pricing)
+- [Sign up](https://prismic.io/dashboard/signup)
+- [Support](https://prismic.io/docs/help-center)
+- [Changelog](https://prismic.io/updates)
+- [Blog](https://prismic.io/blog)
+- [Security](https://prismic.io/legal/security)
+- [Terms of service](https://prismic.io/legal/terms-of-service)
+- [Privacy policy](https://prismic.io/legal/privacy)
+- [GitHub](https://github.com/prismicio)
+- [Status](https://status.prismic.io/)
+
+## API Evangelist rating
+
+**Kin Score 71.2** — exemplar · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 86.7 |
+| Contract quality | 45.8 |
+| Contract governance | 18.2 |
+| Operational transparency | 84.2 |
+| Developer ergonomics | 90.5 |
+| Access clarity | 84.2 |
+
+**Agent readiness 53.6** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | verified |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | yes |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | verified |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | na |
+
+**Regulatory alignment 35.3** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/prismic/](https://apis.io/providers/prismic/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Prismic: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/prismic/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
